@@ -1,0 +1,106 @@
+{
+  "files": {
+    "matches/32990842810194.json": {
+      "bytes": 18931,
+      "sha256": "33bad1a8a3b96e80a67f4d66825a17409dbf0091c61cb1ba1de942569b79f371"
+    },
+    "matches/33180210900017.json": {
+      "bytes": 15829,
+      "sha256": "0f88d8f8c7507f4cd3d0b0f6f2c715fefd431d9779daaebc30cbd26ddf35c035"
+    },
+    "matches/33182699020169.json": {
+      "bytes": 17527,
+      "sha256": "04770c5ecba02965f9cb3a52c3ef9066aa0ca7a8a389da7eee69dc92ace277f3"
+    },
+    "matches/33226881670028.json": {
+      "bytes": 16203,
+      "sha256": "a09ba390af6c237f1c99ff9131429a38ff60bb194fd72fafaa0faff4ca0385d1"
+    },
+    "matches/33260141470341.json": {
+      "bytes": 14567,
+      "sha256": "5f3679ed297c3d84c4e4898f4f02f1cca4adf8db6838bef6c96066e52422d5eb"
+    },
+    "matches/33468778790053.json": {
+      "bytes": 18948,
+      "sha256": "86e1efe7eabed54b0b18a3dffc01aef0df9cb5163d646f04193c1ff6e4d2e7c9"
+    },
+    "matches/33510491320104.json": {
+      "bytes": 16042,
+      "sha256": "bae9e453ffe231d6cad76cee5fdf75e80047b742f5b87ddf715190ca0c790897"
+    },
+    "matches/33580520790052.json": {
+      "bytes": 18935,
+      "sha256": "9a96c37b77ed5fb065819892788d7336f2c1e34cf42825d678e2981578a4e496"
+    },
+    "matches/33614256740129.json": {
+      "bytes": 14567,
+      "sha256": "eb227b561abbc20be5b9fe6e84a1260eca651c8453b5f4659b71fe859ac14bcb"
+    },
+    "matches/33616119890352.json": {
+      "bytes": 16042,
+      "sha256": "9118087ce93abea332bf1cbea5f8d4742ddd37030a9a14d4a146ec1a8c118012"
+    },
+    "responses/leagueMatch/00d97e8d0424893ff7ba6cd5a83248a6789123104e2aa0f68817094dce4dd18b.json": {
+      "bytes": 143249,
+      "sha256": "00d97e8d0424893ff7ba6cd5a83248a6789123104e2aa0f68817094dce4dd18b"
+    },
+    "responses/playoffMatch/051b44ba46071835bb9b94f192df6b180ec35436bcad022d5304a4723f7463cf.json": {
+      "bytes": 105,
+      "sha256": "051b44ba46071835bb9b94f192df6b180ec35436bcad022d5304a4723f7463cf"
+    },
+    "revisions/32990842810194/33bad1a8a3b96e80a67f4d66825a17409dbf0091c61cb1ba1de942569b79f371.json": {
+      "bytes": 18931,
+      "sha256": "33bad1a8a3b96e80a67f4d66825a17409dbf0091c61cb1ba1de942569b79f371"
+    },
+    "revisions/33180210900017/0f88d8f8c7507f4cd3d0b0f6f2c715fefd431d9779daaebc30cbd26ddf35c035.json": {
+      "bytes": 15829,
+      "sha256": "0f88d8f8c7507f4cd3d0b0f6f2c715fefd431d9779daaebc30cbd26ddf35c035"
+    },
+    "revisions/33182699020169/04770c5ecba02965f9cb3a52c3ef9066aa0ca7a8a389da7eee69dc92ace277f3.json": {
+      "bytes": 17527,
+      "sha256": "04770c5ecba02965f9cb3a52c3ef9066aa0ca7a8a389da7eee69dc92ace277f3"
+    },
+    "revisions/33226881670028/a09ba390af6c237f1c99ff9131429a38ff60bb194fd72fafaa0faff4ca0385d1.json": {
+      "bytes": 16203,
+      "sha256": "a09ba390af6c237f1c99ff9131429a38ff60bb194fd72fafaa0faff4ca0385d1"
+    },
+    "revisions/33260141470341/5f3679ed297c3d84c4e4898f4f02f1cca4adf8db6838bef6c96066e52422d5eb.json": {
+      "bytes": 14567,
+      "sha256": "5f3679ed297c3d84c4e4898f4f02f1cca4adf8db6838bef6c96066e52422d5eb"
+    },
+    "revisions/33468778790053/86e1efe7eabed54b0b18a3dffc01aef0df9cb5163d646f04193c1ff6e4d2e7c9.json": {
+      "bytes": 18948,
+      "sha256": "86e1efe7eabed54b0b18a3dffc01aef0df9cb5163d646f04193c1ff6e4d2e7c9"
+    },
+    "revisions/33510491320104/bae9e453ffe231d6cad76cee5fdf75e80047b742f5b87ddf715190ca0c790897.json": {
+      "bytes": 16042,
+      "sha256": "bae9e453ffe231d6cad76cee5fdf75e80047b742f5b87ddf715190ca0c790897"
+    },
+    "revisions/33580520790052/9a96c37b77ed5fb065819892788d7336f2c1e34cf42825d678e2981578a4e496.json": {
+      "bytes": 18935,
+      "sha256": "9a96c37b77ed5fb065819892788d7336f2c1e34cf42825d678e2981578a4e496"
+    },
+    "revisions/33614256740129/eb227b561abbc20be5b9fe6e84a1260eca651c8453b5f4659b71fe859ac14bcb.json": {
+      "bytes": 14567,
+      "sha256": "eb227b561abbc20be5b9fe6e84a1260eca651c8453b5f4659b71fe859ac14bcb"
+    },
+    "revisions/33616119890352/9118087ce93abea332bf1cbea5f8d4742ddd37030a9a14d4a146ec1a8c118012.json": {
+      "bytes": 16042,
+      "sha256": "9118087ce93abea332bf1cbea5f8d4742ddd37030a9a14d4a146ec1a8c118012"
+    },
+    "snapshots/leagueMatch/85326bfef8d99b5bec139ce3401772577b94ef2c8e36b2fc27c7f537c1d02d38.json": {
+      "bytes": 164774,
+      "sha256": "85326bfef8d99b5bec139ce3401772577b94ef2c8e36b2fc27c7f537c1d02d38"
+    },
+    "snapshots/playoffMatch/37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570.json": {
+      "bytes": 3,
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+    }
+  },
+  "identity": {
+    "club_id": "696276",
+    "edition": "fc27",
+    "platform": "common-gen5"
+  },
+  "version": 1
+}

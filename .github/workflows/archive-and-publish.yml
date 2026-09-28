@@ -1,0 +1,151 @@
+name: Archive matches and publish viewer
+
+on:
+  schedule:
+    # Best effort, not a guaranteed timer. Preserve a custom cron when upgrading.
+    - cron: '7,22,37,52 * * * *'
+  workflow_dispatch:
+    inputs:
+      resume:
+        description: 'Resume after a resolved 401/403? Does NOT bypass rate-limit cooldowns.'
+        type: boolean
+        default: false
+      backup:
+        description: 'Also upload a full recovery ZIP (14-day artifact retention)?'
+        type: boolean
+        default: false
+  push:
+    branches: [main]
+    paths:
+      - 'config.json'
+      - 'scripts/**'
+      - 'tests/**'
+      - 'site/**'
+      - 'data/**'
+      - '.github/workflows/**'
+
+concurrency:
+  group: clubs-archive-and-pages
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  archive-and-publish:
+    if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Check out current archive
+        id: checkout
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          fetch-depth: 0
+
+      - name: Check whether scheduled collection is enabled
+        id: plan
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+        run: |
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          config = json.loads(Path('config.json').read_text(encoding='utf-8-sig'))
+          active = os.environ['EVENT_NAME'] != 'schedule' or config.get('collection_enabled') is True
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
+              print('active=' + str(active).lower(), file=f)
+          PY
+
+      - name: Set up Python
+        if: steps.plan.outputs.active == 'true'
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Run offline collector and persistence tests
+        if: steps.plan.outputs.active == 'true'
+        run: python -m unittest discover -s tests -v
+
+      - name: Set up Node for viewer tests
+        if: steps.plan.outputs.active == 'true'
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      - name: Test viewer aggregation and exports
+        if: steps.plan.outputs.active == 'true'
+        run: |
+          node --check site/assets/app.js
+          node --check site/assets/stats.js
+          node --test tests/test_stats.cjs
+
+      - name: Fetch and build
+        id: fetch
+        if: steps.plan.outputs.active == 'true'
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          RESUME: ${{ inputs.resume }}
+        shell: bash
+        run: |
+          args=(--event push --defer-failure)
+          if [[ "$EVENT_NAME" == "schedule" ]]; then
+            args=(--event schedule --defer-failure)
+          elif [[ "$EVENT_NAME" == "workflow_dispatch" ]]; then
+            args=(--event manual --defer-failure)
+          fi
+          if [[ "$EVENT_NAME" == "workflow_dispatch" && "$RESUME" == "true" ]]; then
+            args+=(--resume)
+          fi
+          python scripts/tracker.py sync "${args[@]}"
+
+      # This must run even if sync's viewer build or CSV export failed.
+      - name: Preserve and push raw history BEFORE Pages deployment
+        id: persist
+        if: always() && steps.plan.outputs.active == 'true' && (steps.fetch.outcome == 'success' || steps.fetch.outcome == 'failure')
+        env:
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: python scripts/persist_archive.py --branch "$DEFAULT_BRANCH"
+
+      # Fallback is transient, NOT an independent permanent backup. Normal runs
+      # rely on the successful Git push and do not consume an artifact per poll.
+      - name: Upload recovery ZIP after a failure or manual backup request
+        if: always() && steps.plan.outputs.active == 'true' && (steps.persist.outcome == 'failure' || steps.fetch.outcome == 'failure' || inputs.backup == true)
+        uses: actions/upload-artifact@v7
+        with:
+          name: dubsfc-recovery-${{ github.run_id }}-${{ github.run_attempt }}
+          path: .runtime/recovery/*.zip
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Verify the archive that will be published
+        if: success() && steps.plan.outputs.active == 'true'
+        run: python scripts/tracker.py verify
+
+      - name: Configure Pages
+        if: success() && steps.plan.outputs.active == 'true'
+        uses: actions/configure-pages@v5
+
+      - name: Upload static viewer only
+        if: success() && steps.plan.outputs.active == 'true'
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: site
+          retention-days: 1
+
+      - name: Publish GitHub Pages
+        id: deployment
+        if: success() && steps.plan.outputs.active == 'true'
+        uses: actions/deploy-pages@v4
+
+      - name: Mark collection problems as workflow failures
+        if: always() && steps.plan.outputs.active == 'true' && steps.fetch.outcome == 'success'
+        run: python scripts/tracker.py check-status

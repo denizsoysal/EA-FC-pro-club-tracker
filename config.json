@@ -1,0 +1,12 @@
+{
+  "club_name": "Dubs VzeDoux",
+  "club_id": "696276",
+  "platform": "common-gen5",
+  "edition": "fc27",
+  "match_types": [
+    "leagueMatch",
+    "playoffMatch"
+  ],
+  "collection_enabled": false,
+  "advanced_mapping_confirmed": true
+}

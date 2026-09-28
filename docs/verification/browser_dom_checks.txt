@@ -1,0 +1,35 @@
+PASS: demo renders 5 synthetic players
+PASS: synthetic payload cannot look like a live archive
+PASS: exactly four metric tabs
+PASS: page title uses requested brand
+PASS: wordmark updated
+PASS: no event coverage in viewer
+PASS: explanatory block removed
+PASS: hero slogan removed
+PASS: overview includes shots on target
+PASS: Passing tab changes columns and active state
+PASS: Dribbling tab changes columns and active state
+PASS: Defending tab changes columns and active state
+PASS: no crossing column
+PASS: per-match toggle does not change percentages
+PASS: unrequested pass columns removed
+PASS: player search filters visible rows
+PASS: view CSV respects player search and selected category
+PASS: competition filter selects demo friendlies
+PASS: missing friendly event data stays unavailable
+PASS: last-5 archive filter works
+PASS: expanded match provides all four statistic groups
+PASS: match detail omits forward and long columns
+PASS: keyboard arrow navigation selects next tab
+PASS: 390px mobile has no page-level horizontal overflow
+PASS: 320px mobile has no page-level horizontal overflow
+PASS: real empty archive is not replaced by demo data
+PASS: empty production dataset is not labelled synthetic
+PASS: no build-only health messages shown
+PASS: real failures remain visible
+PASS: untrusted player names render as text, not HTML
+PASS: old viewer payloads tolerate missing newly added fields
+PASS: legacy schema prompts a rebuild
+PASS: no JavaScript page errors: []
+
+33 offline DOM checks passed. HTTP, CSP and live EA access are NOT tested.

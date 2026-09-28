@@ -1,0 +1,166 @@
+TAP version 13
+# Subtest: four views and no crosses or invented key-pass metric
+ok 1 - four views and no crosses or invented key-pass metric
+  ---
+  duration_ms: 2.263836
+  type: 'test'
+  ...
+# Subtest: goals and assists are summed; rating is always averaged
+ok 2 - goals and assists are summed; rating is always averaged
+  ---
+  duration_ms: 0.551075
+  type: 'test'
+  ...
+# Subtest: missing metrics stay null, not zero
+ok 3 - missing metrics stay null, not zero
+  ---
+  duration_ms: 0.199805
+  type: 'test'
+  ...
+# Subtest: a genuine zero counts as an available appearance
+ok 4 - a genuine zero counts as an available appearance
+  ---
+  duration_ms: 0.146357
+  type: 'test'
+  ...
+# Subtest: per-match denominator is available appearances, not all appearances
+ok 5 - per-match denominator is available appearances, not all appearances
+  ---
+  duration_ms: 0.186305
+  type: 'test'
+  ...
+# Subtest: ordinary pass percentage is weighted, not a mean of percentages
+ok 6 - ordinary pass percentage is weighted, not a mean of percentages
+  ---
+  duration_ms: 0.239454
+  type: 'test'
+  ...
+# Subtest: forward percentage is weighted and unchanged by per-match toggle
+ok 7 - forward percentage is weighted and unchanged by per-match toggle
+  ---
+  duration_ms: 0.20302
+  type: 'test'
+  ...
+# Subtest: long percentage uses only paired available counts
+ok 8 - long percentage uses only paired available counts
+  ---
+  duration_ms: 0.133818
+  type: 'test'
+  ...
+# Subtest: zero attempts is undefined rather than 0%
+ok 9 - zero attempts is undefined rather than 0%
+  ---
+  duration_ms: 0.261517
+  type: 'test'
+  ...
+# Subtest: zero completions with positive attempts gives a real 0%
+ok 10 - zero completions with positive attempts gives a real 0%
+  ---
+  duration_ms: 0.354213
+  type: 'test'
+  ...
+# Subtest: invalid pass pairs do not inflate the numerator or coverage
+ok 11 - invalid pass pairs do not inflate the numerator or coverage
+  ---
+  duration_ms: 0.227256
+  type: 'test'
+  ...
+# Subtest: counts do not accidentally include missing values as zero
+ok 12 - counts do not accidentally include missing values as zero
+  ---
+  duration_ms: 0.124734
+  type: 'test'
+  ...
+# Subtest: invalid numbers are not included
+ok 13 - invalid numbers are not included
+  ---
+  duration_ms: 0.154529
+  type: 'test'
+  ...
+# Subtest: event coverage is not exposed in aggregate rows
+ok 14 - event coverage is not exposed in aggregate rows
+  ---
+  duration_ms: 0.68309
+  type: 'test'
+  ...
+# Subtest: same names are separate players; same ID uses latest name
+ok 15 - same names are separate players; same ID uses latest name
+  ---
+  duration_ms: 0.118385
+  type: 'test'
+  ...
+# Subtest: nulls sort last in both directions
+ok 16 - nulls sort last in both directions
+  ---
+  duration_ms: 0.120057
+  type: 'test'
+  ...
+# Subtest: last 5 is applied after competition filtering and chronological sorting
+ok 17 - last 5 is applied after competition filtering and chronological sorting
+  ---
+  duration_ms: 0.742528
+  type: 'test'
+  ...
+# Subtest: date filter excludes absent timestamps; all-history includes them
+ok 18 - date filter excludes absent timestamps; all-history includes them
+  ---
+  duration_ms: 0.114469
+  type: 'test'
+  ...
+# Subtest: single-match ratio computed from counts without aggregate toggle
+ok 19 - single-match ratio computed from counts without aggregate toggle
+  ---
+  duration_ms: 0.087529
+  type: 'test'
+  ...
+# Subtest: CSV escapes formula prefixes, quotes, commas and line breaks
+ok 20 - CSV escapes formula prefixes, quotes, commas and line breaks
+  ---
+  duration_ms: 0.187347
+  type: 'test'
+  ...
+# Subtest: view export respects selected keys, missing values and available-match counts
+ok 21 - view export respects selected keys, missing values and available-match counts
+  ---
+  duration_ms: 0.388334
+  type: 'test'
+  ...
+# Subtest: demo has every displayed normalized key and labels itself synthetic
+ok 22 - demo has every displayed normalized key and labels itself synthetic
+  ---
+  duration_ms: 1.009011
+  type: 'test'
+  ...
+# Subtest: passing view contains only completed passes, pass percentage and through balls
+ok 23 - passing view contains only completed passes, pass percentage and through balls
+  ---
+  duration_ms: 0.077585
+  type: 'test'
+  ...
+# Subtest: view exports have no event coverage, forward pass or long pass column
+ok 24 - view exports have no event coverage, forward pass or long pass column
+  ---
+  duration_ms: 0.265592
+  type: 'test'
+  ...
+# Subtest: dribble label distinguishes reported successes from attempts
+ok 25 - dribble label distinguishes reported successes from attempts
+  ---
+  duration_ms: 0.068321
+  type: 'test'
+  ...
+# Subtest: ball recovered is explicitly restricted to dispossessions
+ok 26 - ball recovered is explicitly restricted to dispossessions
+  ---
+  duration_ms: 0.098676
+  type: 'test'
+  ...
+1..26
+# tests 26
+# suites 0
+# pass 26
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 78.807109

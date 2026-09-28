@@ -1,0 +1,14 @@
+{
+  "source": "User-provided Select-String output, not the full raw match JSON files",
+  "distinct_match_ids": 10,
+  "player_bucket_groups": 76,
+  "statuses": {
+    "parsed:community_mapping": 74,
+    "unavailable:empty_buckets": 2
+  },
+  "groups_containing_ids": {
+    "115": 13,
+    "174": 72
+  },
+  "semantics_validated": false
+}
