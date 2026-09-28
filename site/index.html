@@ -6,9 +6,9 @@
   <meta name="description" content="A team's own EA Clubs match archive and statistics viewer.">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'">
   <title>DubsFC Tracker</title>
-  <link rel="stylesheet" href="assets/style.css?v=3">
-  <script src="assets/stats.js?v=3" defer></script>
-  <script src="assets/app.js?v=3" defer></script>
+  <link rel="stylesheet" href="assets/style.css?v=4">
+  <script src="assets/stats.js?v=4" defer></script>
+  <script src="assets/app.js?v=4" defer></script>
 </head>
 <body>
 <div id="demo-banner" class="demo-banner" hidden>DEMO MODE · Entirely synthetic players and results. Not fetched from EA.</div>
@@ -26,7 +26,6 @@
   <span id="status-pill" class="pill">Loading</span><p id="health-text" aria-live="polite">Loading your archive…</p><span id="freshness" class="muted"></span>
 </section>
 <div id="load-error" class="notice danger" hidden></div>
-<div id="mapping-note" class="notice" hidden></div>
 <section class="filters" aria-label="Filter statistics">
   <label>Period<select id="period"><option value="all">All archived matches</option><option value="last5">Last 5 matches</option><option value="last10">Last 10 matches</option><option value="7">Last 7 days</option><option value="30">Last 30 days</option><option value="90">Last 90 days</option></select></label>
   <label>Competition<select id="competition"><option value="all">All match types</option><option value="leagueMatch">League</option><option value="playoffMatch">Playoffs</option><option value="friendlyMatch">Friendlies</option></select></label>
@@ -48,6 +47,7 @@
   </div>
   <div id="stat-tabs" class="stat-tabs" role="tablist" aria-label="Player statistics category">
     <button type="button" role="tab" id="tab-overview" data-view="overview" aria-selected="true" aria-controls="stats-panel" tabindex="0">Overview</button>
+    <button type="button" role="tab" id="tab-shooting" data-view="shooting" aria-selected="false" aria-controls="stats-panel" tabindex="-1">Shooting</button>
     <button type="button" role="tab" id="tab-passing" data-view="passing" aria-selected="false" aria-controls="stats-panel" tabindex="-1">Passing</button>
     <button type="button" role="tab" id="tab-dribbling" data-view="dribbling" aria-selected="false" aria-controls="stats-panel" tabindex="-1">Dribbling</button>
     <button type="button" role="tab" id="tab-defending" data-view="defending" aria-selected="false" aria-controls="stats-panel" tabindex="-1">Defending</button>
@@ -58,10 +58,11 @@
     <div class="table-wrap" role="region" aria-label="Player statistics, scroll horizontally for more columns" tabindex="0">
       <table id="player-table"><thead><tr id="player-head"></tr></thead><tbody id="player-body"></tbody></table>
     </div>
-    <div class="table-caption"><span id="view-count">Waiting for data</span><span>* Community-mapped metric · † Some matches unavailable</span></div>
+    <div class="table-caption">
+  <span id="view-count">Waiting for data</span>
+</div>
   </div>
-  <p class="table-footnote">MP = matches played in this archive. “—” = unavailable, not zero. Hover a heading for its definition. * Community-mapped statistic. † Some matches unavailable.</p>
-</section>
+<p class="table-footnote">MP = matches played in this archive. “—” = unavailable, not zero. Hover a heading for its definition. † Some matches unavailable.</p></section>
 <section class="panel" id="matches">
   <div class="panel-title"><div><div class="eyebrow">THE ARCHIVE</div><h2>Match history</h2></div><span id="matches-label" class="muted"></span></div>
   <div id="match-list"></div><button id="more-matches" class="button secondary more" hidden>Show more matches</button>

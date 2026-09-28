@@ -61,13 +61,11 @@ th,td{padding:14px 15px;border-bottom:1px solid var(--line)}
 th:first-child,td:first-child{text-align:left;padding-left:24px}
 th:last-child,td:last-child{padding-right:24px}
 th button{border:0;color:inherit;background:none;font-size:inherit;font-weight:inherit;padding:0;text-transform:inherit;letter-spacing:inherit}
-th.accent{color:var(--accent)}
 tbody tr:last-child td{border-bottom:0}
 tbody tr:hover{background:#18232e}
 .player-cell{display:flex;align-items:center;gap:10px}
 .avatar{display:grid;place-items:center;width:29px;height:29px;border-radius:8px;background:#263341;color:var(--cyan);font-size:10px;font-weight:800}
 .player-name{font-weight:650;max-width:230px;white-space:normal;overflow-wrap:anywhere}
-.num-accent{color:var(--accent)}
 
 .table-footnote{padding:14px 24px;margin:0;border-top:1px solid var(--line);color:var(--muted);font-size:11px;line-height:1.7}
 .empty{padding:36px 24px!important;text-align:center!important;color:var(--muted);font-size:13px;white-space:normal!important}
@@ -223,3 +221,37 @@ tbody th[scope=row]{background:inherit;color:var(--text);font-size:13px;text-tra
 /* DubsFC identity: keep the wordmark legible at every viewport. */
 .brand{letter-spacing:0;font-size:18px}.brand-light{font-size:inherit;font-weight:500}
 @media(max-width:700px){.cards{grid-template-columns:1fr}.brand{font-size:16px}.brand-light{font-size:inherit}}
+
+/* Only column-leading numeric cells receive this highlight. */
+td.column-best {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+/* Summary cards: `.card span` would otherwise make these block-level and muted. */
+.card strong span {
+  display: inline;
+  font-size: inherit;
+}
+
+.card strong .record-win,
+.card strong .goals-for {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.card strong .record-draw {
+  color: inherit;
+  font-weight: 700;
+}
+
+.card strong .record-loss,
+.card strong .goals-against {
+  color: #f87171;
+  font-weight: 700;
+}
+
+.card strong .record-separator {
+  color: var(--muted);
+  font-weight: 400;
+}

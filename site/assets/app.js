@@ -30,9 +30,9 @@ function metricText(value, key, perMatch = false) {
 }
 function renderHeader() {
   const row = $("player-head"); row.replaceChildren();
-  const headers = [["name", "Player"], ["appearances", "MP"], ...S.VIEWS[activeView].keys.map(key => [key, S.METRICS[key].label + (S.METRICS[key].advanced ? "*" : "")])];
+  const headers = [["name", "Player"], ["appearances", "MP"], ...S.VIEWS[activeView].keys.map(key => [key, S.METRICS[key].label])];
   for (const [key, label] of headers) {
-    const def = S.METRICS[key], th = node("th", undefined, def?.advanced ? "accent" : "");
+    const def = S.METRICS[key], th = node("th");
     th.scope = "col";
     th.setAttribute("aria-sort", key === sortKey ? (sortDirection === 1 ? "ascending" : "descending") : "none");
     const button = node("button", label); button.type = "button"; button.dataset.sort = key;
@@ -43,35 +43,127 @@ function renderHeader() {
 }
 function renderPlayers(matches) {
   renderHeader();
-  const people = visiblePlayers(matches), keys = S.VIEWS[activeView].keys, perMatch = $("per-match").checked;
-  const body = $("player-body"); body.replaceChildren();
-  $("view-note").textContent = S.VIEWS[activeView].note;
-  $("view-count").textContent = `${people.length} players · ${perMatch ? "per available match" : "totals"}`;
-  $("export-view").disabled = people.length === 0;
-  if (!people.length) {
-    const tr = node("tr"), td = node("td", matches.length ? "No player records match this filter." : "No matches archived yet. Set your club ID, then run the collector.", "empty");
-    td.colSpan = keys.length + 2; tr.append(td); body.append(tr); return;
+
+  const people = visiblePlayers(matches);
+  const keys = S.VIEWS[activeView].keys;
+  const perMatch = $("per-match").checked;
+
+  // Include matches played as well as the visible statistics.
+  // Values come from the current filtered totals/per-match view.
+  const numericKeys = ["appearances", ...keys];
+  const maxima = {};
+
+  for (const key of numericKeys) {
+    maxima[key] = null;
+
+    for (const player of people) {
+      const value = player[key];
+
+      if (
+        S.finite(value) &&
+        (maxima[key] === null || value > maxima[key])
+      ) {
+        maxima[key] = value;
+      }
+    }
   }
+
+  function isColumnMaximum(value, key) {
+    return (
+      S.finite(value) &&
+      maxima[key] !== null &&
+      value === maxima[key]
+    );
+  }
+
+  const body = $("player-body");
+  body.replaceChildren();
+
+  $("view-note").textContent = S.VIEWS[activeView].note;
+  $("view-count").textContent =
+    `${people.length} players · ${perMatch ? "per available match" : "totals"}`;
+
+  $("export-view").disabled = people.length === 0;
+
+  if (!people.length) {
+    const tr = node("tr");
+    const td = node(
+      "td",
+      matches.length
+        ? "No player records match this filter."
+        : "No matches archived yet. Set your club ID, then run the collector.",
+      "empty"
+    );
+
+    td.colSpan = keys.length + 2;
+    tr.append(td);
+    body.append(tr);
+    return;
+  }
+
   for (const p of people) {
-    const tr = node("tr"), first = node("th"), wrap = node("div", undefined, "player-cell"); first.scope = "row";
-    wrap.append(node("span", p.name.slice(0, 2).toUpperCase(), "avatar"), node("span", p.name, "player-name"));
-    first.append(wrap); tr.append(first, node("td", format(p.appearances)));
+    const tr = node("tr");
+    const first = node("th");
+    const wrap = node("div", undefined, "player-cell");
+
+    first.scope = "row";
+
+    wrap.append(
+      node("span", p.name.slice(0, 2).toUpperCase(), "avatar"),
+      node("span", p.name, "player-name")
+    );
+
+    first.append(wrap);
+
+    const appearances = node(
+      "td",
+      format(p.appearances),
+      isColumnMaximum(p.appearances, "appearances")
+        ? "column-best"
+        : ""
+    );
+
+    appearances.dataset.stat = "appearances";
+
+    tr.append(first, appearances);
+
     for (const key of keys) {
-      const count = p.counts[key] || 0, partial = S.finite(p[key]) && count < p.appearances;
-      const td = node("td", metricText(p[key], key, perMatch) + (partial ? " †" : ""), S.METRICS[key].advanced ? "num-accent" : "");
+      const count = p.counts[key] || 0;
+      const partial = S.finite(p[key]) && count < p.appearances;
+
+      const td = node(
+        "td",
+        metricText(p[key], key, perMatch) + (partial ? " †" : ""),
+        isColumnMaximum(p[key], key) ? "column-best" : ""
+      );
+
       td.dataset.stat = key;
-      td.title = `${count} / ${p.appearances} appearances contain valid data for this statistic.`;
-      if (p.pairs[key]) td.title += ` ${p.pairs[key].made} completed / ${p.pairs[key].attempted} attempted.`;
-      if (S.METRICS[key].kind === "rate" && !S.finite(p[key]) && count) td.title += " No attempts: percentage is undefined, not 0%.";
+      td.title =
+        `${count} / ${p.appearances} appearances contain valid data for this statistic.`;
+
+      if (p.pairs[key]) {
+        td.title +=
+          ` ${p.pairs[key].made} completed / ${p.pairs[key].attempted} attempted.`;
+      }
+
+      if (
+        S.METRICS[key].kind === "rate" &&
+        !S.finite(p[key]) &&
+        count
+      ) {
+        td.title += " No attempts: percentage is undefined, not 0%.";
+      }
+
       tr.append(td);
     }
+
     body.append(tr);
   }
 }
 function miniTable(match, view) {
   const keys = S.VIEWS[view].keys, wrap = node("div", undefined, "table-wrap"), table = node("table"), thead = node("thead"), head = node("tr"), body = node("tbody");
   for (const key of ["name", ...keys]) {
-    const def = S.METRICS[key], th = node("th", key === "name" ? "Player" : (key === "rating" ? "Rating" : def.label) + (def.advanced ? "*" : ""));
+    const def = S.METRICS[key], th = node("th", key === "name" ? "Player" : (key === "rating" ? "Rating" : def.label));
     th.scope = "col"; if (def) th.title = def.description; head.append(th);
   }
   thead.append(head); table.append(thead, body); wrap.append(table);
@@ -115,9 +207,49 @@ function render() {
   const matches = filteredMatches(), players = matches.flatMap(m => m.players || []), scored = matches.filter(m => S.finite(m.goals) && S.finite(m.goals_against));
   $("match-count").textContent = format(matches.length);
   $("match-caption").textContent = `${new Set(players.map(p => p.id)).size} players in these matches`;
-  $("record").textContent = matches.length ? ["W", "D", "L"].map(r => matches.filter(m => m.result === r).length).join(" · ") : "—";
+  const wins = matches.filter(m => m.result === "W").length;
+  const draws = matches.filter(m => m.result === "D").length;
+  const losses = matches.filter(m => m.result === "L").length;
+
+  const record = $("record");
+  record.replaceChildren();
+
+  if (matches.length) {
+    record.append(
+      node("span", String(wins), "record-win"),
+      node("span", " · ", "record-separator"),
+      node("span", String(draws), "record-draw"),
+      node("span", " · ", "record-separator"),
+      node("span", String(losses), "record-loss")
+    );
+  } else {
+    record.textContent = "—";
+  }
+
   $("record").title = `${matches.filter(m => !m.result).length} matches have unknown outcomes. Score fallbacks do not infer shoot-outs.`;
-  $("goals").textContent = scored.length ? `${scored.reduce((n, m) => n + m.goals, 0)} / ${scored.reduce((n, m) => n + m.goals_against, 0)}` : "—";
+  const goalsFor = scored.reduce(
+    (total, match) => total + match.goals,
+    0
+  );
+
+  const goalsAgainst = scored.reduce(
+    (total, match) => total + match.goals_against,
+    0
+  );
+
+  const goals = $("goals");
+  goals.replaceChildren();
+
+  if (scored.length) {
+    goals.append(
+      node("span", String(goalsFor), "goals-for"),
+      node("span", " / ", "record-separator"),
+      node("span", String(goalsAgainst), "goals-against")
+    );
+  } else {
+    goals.textContent = "—";
+  }
+
   $("goal-caption").textContent = `${scored.length} / ${matches.length} matches with both score fields`;
   renderPlayers(matches); renderMatches(matches);
 }
@@ -161,14 +293,6 @@ async function init() {
     $("health-text").textContent = needsNotice ? (report.message || "Check the collector log.") : "";
     $("freshness").textContent = report.last_api_attempt_at ? "API attempt: " + dateText(report.last_api_attempt_at) : "";
     $("archive-stamp").textContent = demo ? "Synthetic data · not your club records" : archive.archive_updated_at ? "Archive changed: " + dateText(archive.archive_updated_at) : "Archive is empty";
-    const note = $("mapping-note"); note.hidden = false;
-    const reviewed = config.advanced_mapping_confirmed === true && config.advanced_mapping_version === archive.decoder && archive.mapping_reviewed === true;
-    note.textContent = reviewed
-      ? "* Community-mapped stats · This decoder version is marked reviewed by the owner."
-      : "* Advanced stats use community mappings, not official EA definitions.";
-    if (archive.schema_version === 1) note.textContent += " Older viewer data: rebuild the archive to populate the added metrics.";
-    const warnings = archive.matches.flatMap(m => m.players || []).filter(p => (p.data_warnings || []).length || p.assists_counter_disagrees).length;
-    if (warnings) note.textContent += ` ${warnings} player records have consistency warnings; review their raw payloads / exported CSV.`;
     if (archive.repository && /^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(archive.repository)) {
       const link = $("log-link"); link.href = `https://github.com/${archive.repository}/actions/workflows/archive-and-publish.yml`; link.hidden = false;
     }

@@ -33,13 +33,18 @@
   const VIEWS = {
     overview: {
       label: "Overview", defaultSort: "goals",
-      keys: ["goals", "assists", "second_assists", "shots", "shots_on_target", "rating"],
-      note: "Goals, creation and shooting. Second assists are the pass before the assist—not key passes.",
+      keys: ["goals", "assists", "second_assists", "dribbles_completed", "tackles_won", "rating"],
+      note: "Goals, creation, dribbling and defending. Second assists are the pass before the assist—not key passes.",
+    },
+    shooting: {
+      label: "Shooting", defaultSort: "goals",
+      keys: ["goals", "shots", "shots_on_target"],
+      note: "Goals and shots come from ordinary API fields; shots on target is a community-mapped event. Missing values are unavailable, not zero.",
     },
     passing: {
       label: "Passing", defaultSort: "through_balls_completed",
-      keys: ["passes_made", "pass_rate", "through_balls_completed"],
-      note: "Completion percentages are weighted by attempts. Through balls count successful passes only.",
+      keys: ["assists", "passes_made", "pass_rate", "through_balls_completed"],
+      note: "Completion percentages are weighted by attempts. Through balls count successful passes only. Assists are the ordinary API field.",
     },
     dribbling: {
       label: "Dribbling", defaultSort: "dribble_beats",
