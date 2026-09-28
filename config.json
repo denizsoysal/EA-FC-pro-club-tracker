@@ -7,6 +7,6 @@
     "leagueMatch",
     "playoffMatch"
   ],
-  "collection_enabled": false,
+  "collection_enabled": true,
   "advanced_mapping_confirmed": true
 }
