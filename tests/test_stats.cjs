@@ -10,8 +10,8 @@ const m = (players, extra = {}) => ({id: '10', timestamp: '2026-09-28T10:00:00Z'
   match_types: ['leagueMatch'], players, ...extra});
 const total = (players, opts) => S.playerTotals(players.map(player => m([player])), opts)[0];
 
-test('four views and no crosses or invented key-pass metric', () => {
-  assert.deepEqual(Object.keys(S.VIEWS), ['overview', 'passing', 'dribbling', 'defending']);
+test('five views and no crosses or invented key-pass metric', () => {
+  assert.deepEqual(Object.keys(S.VIEWS), ['overview', 'shooting', 'passing', 'dribbling', 'defending']);
   assert(!Object.keys(S.METRICS).some(key => /cross|key_pass|beaten_by_pass/.test(key)));
 });
 test('goals and assists are summed; rating is always averaged', () => {
@@ -114,8 +114,8 @@ test('demo has every displayed normalized key and labels itself synthetic', () =
 });
 
 
-test('passing view contains only completed passes, pass percentage and through balls', () => {
-  assert.deepEqual(S.VIEWS.passing.keys, ['passes_made', 'pass_rate', 'through_balls_completed']);
+test('passing view contains completed passes, pass percentage, through balls and assists', () => {
+  assert.deepEqual(S.VIEWS.passing.keys, ['assists', 'passes_made', 'pass_rate', 'through_balls_completed']);
 });
 test('view exports have no event coverage, forward pass or long pass column', () => {
   for (const view of Object.keys(S.VIEWS)) {

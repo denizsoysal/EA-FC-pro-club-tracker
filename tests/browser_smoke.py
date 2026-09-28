@@ -67,19 +67,21 @@ def main():
         page = load(demo)
         check(page.locator('#player-body tr').count() == 5, 'demo renders 5 synthetic players')
         check(page.locator('#demo-banner').is_visible(), 'synthetic payload cannot look like a live archive')
-        check(page.get_by_role('tab').count() == 4, 'exactly four metric tabs')
+        check(page.get_by_role('tab').count() == 5, 'exactly five metric tabs')
         check(page.title() == 'DubsFC Tracker', 'page title uses requested brand')
         check('DubsFC Tracker' in page.locator('.brand').inner_text(), 'wordmark updated')
         check('Event coverage' not in page.locator('body').inner_text(), 'no event coverage in viewer')
         check('Know what the numbers mean' not in page.locator('body').inner_text(), 'explanatory block removed')
         check('Every match you save' not in page.locator('body').inner_text(), 'hero slogan removed')
-        check('On target' in page.locator('#player-head').text_content(), 'overview includes shots on target')
+        overview_head = page.locator('#player-head').text_content()
+        check('Successful dribbles' in overview_head and 'Tackles won' in overview_head, 'overview includes successful dribbles and tackles won')
+        check('Shots' not in overview_head and 'On target' not in overview_head, 'overview omits shooting columns')
 
         if args.screenshots:
             args.screenshots.mkdir(parents=True, exist_ok=True)
             page.screenshot(path=str(args.screenshots / 'overview-desktop.png'), full_page=True)
 
-        for view, expected in [('Passing', 'Through balls'), ('Dribbling', 'Skill-move beats'), ('Defending', 'Ball recovered (dispossessions)')]:
+        for view, expected in [('Shooting', 'On target'), ('Passing', 'Through balls'), ('Dribbling', 'Skill-move beats'), ('Defending', 'Ball recovered (dispossessions)')]:
             tab = page.get_by_role('tab', name=view, exact=True); tab.click()
             check(tab.get_attribute('aria-selected') == 'true' and expected in page.locator('#player-head').text_content(), f'{view} tab changes columns and active state')
             if args.screenshots:
@@ -116,13 +118,13 @@ def main():
         page.locator('#period').select_option('all')
         page.locator('.match-item > summary').first.click()
         page.wait_for_selector('.match-group')
-        check(page.locator('.match-item').first.locator('.match-group').count() == 4, 'expanded match provides all four statistic groups')
+        check(page.locator('.match-item').first.locator('.match-group').count() == 5, 'expanded match provides all five statistic groups')
         page.locator('.match-item').first.locator('[data-group="passing"] > summary').click()
         check('Forward %' not in page.locator('.match-item').first.locator('[data-group="passing"]').text_content(), 'match detail omits forward and long columns')
         page.get_by_role('tab', name='Overview', exact=True).focus()
         page.get_by_role('tab', name='Overview', exact=True).click()
         page.keyboard.press('ArrowRight')
-        check(page.get_by_role('tab', name='Passing', exact=True).get_attribute('aria-selected') == 'true', 'keyboard arrow navigation selects next tab')
+        check(page.get_by_role('tab', name='Shooting', exact=True).get_attribute('aria-selected') == 'true', 'keyboard arrow navigation selects next tab')
 
         # Collapse detail and reset viewport for visual inspection.
         page.locator('.match-item > summary').first.click()
@@ -160,7 +162,7 @@ def main():
         page = load(legacy)
         page.get_by_role('tab', name='Dribbling', exact=True).click()
         check(all(value == '—' for value in page.locator('[data-stat="dribble_beats"]').all_inner_texts()), 'old viewer payloads tolerate missing newly added fields')
-        check('Older viewer data' in page.locator('#mapping-note').inner_text(), 'legacy schema prompts a rebuild')
+        check(page.locator('#mapping-note').count() == 0, 'community-mapping banner is removed, including for legacy schema payloads')
         page.close()
         check(not errors, 'no JavaScript page errors: ' + repr(errors))
         browser.close()

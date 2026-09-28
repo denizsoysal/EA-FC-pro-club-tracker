@@ -74,8 +74,9 @@ failures, access-denial pauses, and possible missed-match warnings still display
 
 | View | Columns, in addition to player and appearances |
 | --- | --- |
-| Overview | Goals, assists, second assists, shots, shots on target, average rating |
-| Passing | Passes made, pass %, successful through balls |
+| Overview | Goals, assists, second assists, successful dribbles, tackles won, average rating |
+| Shooting | Goals, shots, shots on target |
+| Passing | Assists, passes made, pass %, successful through balls |
 | Dribbling | Successful dribbles, non-skill opponents beaten, skill-move beats |
 | Defending | Interceptions, tackles won, standing won, sliding won, ball recovered (dispossessions) |
 

@@ -6,8 +6,9 @@ Decoder identifier: `community-selected-stats-v2-unofficial`.
 
 | View | Statistics |
 | --- | --- |
-| Overview | Goals, assists, second assists, shots, shots on target, average rating |
-| Passing | Passes made, pass completion, successful through balls |
+| Overview | Goals, assists, second assists, successful dribbles, tackles won, average rating |
+| Shooting | Goals, shots, shots on target |
+| Passing | Assists, passes made, pass completion, successful through balls |
 | Dribbling | Successful dribbles (reported completions), non-skill dribble beats, skill-move beats |
 | Defending | Interceptions, tackles won, standing/sliding tackles won, ball recovered (dispossessions) |
 
