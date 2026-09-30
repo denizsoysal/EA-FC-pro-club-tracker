@@ -61,12 +61,17 @@ CSV_STATS = [
     "opponents_dispossessed",
 ]
 MAX_RESPONSE = 15 * 1024 * 1024
+CLUB_KEYS = ("club_id", "club_name", "platform", "edition")
+SAFE_LABEL = r"[a-zA-Z0-9_-]+"
+# Seconds between any two API requests in one run, including across clubs.
+REQUEST_PAUSE = 2
 
 
 class EAError(RuntimeError):
-    def __init__(self, message: str, *, code: int | None = None, retry_after: str = ""):
+    def __init__(self, message: str, *, code: int | None = None, retry_after: str = "",
+                 unreachable: bool = False):
         super().__init__(message)
-        self.code, self.retry_after = code, retry_after
+        self.code, self.retry_after, self.unreachable = code, retry_after, unreachable
 
 
 def utcnow() -> datetime:
@@ -92,14 +97,19 @@ def load_config(root: Path = ROOT) -> dict[str, Any]:
     config = read_json(root / "config.json")
     if not isinstance(config, dict):
         raise ValueError("config.json must contain a JSON object.")
+    listed = "clubs" in config
     for key in ("edition", "platform"):
+        # Beside a clubs list these are only defaults for entries that omit them.
+        if listed and key not in config:
+            continue
         value = config.get(key)
-        if not isinstance(value, str) or not re.fullmatch(r"[a-zA-Z0-9_-]+", value):
+        if not isinstance(value, str) or not re.fullmatch(SAFE_LABEL, value):
             raise ValueError(f"Invalid {key}: use only letters, numbers, underscores and hyphens.")
     club = str(config.get("club_id", ""))
     if club and not re.fullmatch(r"[0-9]+", club):
         raise ValueError("club_id must be the numeric EA club ID, or blank during setup.")
-    config["club_id"] = club
+    if not listed or "club_id" in config:
+        config["club_id"] = club
     types = config.get("match_types", [])
     if not isinstance(types, list) or not types or len(types) != len(set(types)):
         raise ValueError("match_types must be a nonempty list without duplicates.")
@@ -112,7 +122,89 @@ def load_config(root: Path = ROOT) -> dict[str, Any]:
     # approve the newly added community mappings.
     if not isinstance(config.get("advanced_mapping_version", ""), str):
         raise ValueError("advanced_mapping_version must be a string when supplied.")
+    default_club(config)  # Validates every club and the default before anything runs.
     return config
+
+
+def configured_clubs(config: dict) -> list[dict]:
+    """One settings dict per club, in collection order.
+
+    A `clubs` list is authoritative: legacy top-level club fields beside it are
+    ignored, so a club named in both places is never collected twice. Without
+    the list, the top-level club is the only one (none while club_id is blank).
+    Every returned dict has the shape of a single-club config.
+    """
+    shared = {k: v for k, v in config.items() if k not in (*CLUB_KEYS, "clubs", "default_club_id")}
+    if "clubs" in config:
+        entries = config["clubs"]
+        if not isinstance(entries, list) or not entries:
+            raise ValueError("clubs must be a nonempty list of club objects.")
+    else:
+        entries = [config] if str(config.get("club_id", "")) else []
+    clubs, seen = [], set()
+    for entry in entries:
+        if not isinstance(entry, dict):
+            raise ValueError("Each entry in clubs must be an object.")
+        club_id = entry.get("club_id")
+        if isinstance(club_id, bool) or not re.fullmatch(r"[0-9]+", str(club_id)):
+            raise ValueError("Every club needs club_id: the numeric EA club ID.")
+        club_id = str(club_id)
+        # The ID is the viewer's selector key and dataset folder, so it must be
+        # unique on its own, not only in combination with platform and edition.
+        if int(club_id) in seen:
+            raise ValueError(f"Duplicate club_id {club_id}: list each club once.")
+        seen.add(int(club_id))
+        club = {**shared, "club_id": club_id}
+        for key in ("edition", "platform"):
+            value = entry.get(key, config.get(key))
+            if not isinstance(value, str) or not re.fullmatch(SAFE_LABEL, value):
+                raise ValueError(f"Invalid {key} for club {club_id}: use only letters, "
+                                 "numbers, underscores and hyphens.")
+            club[key] = value
+        name = entry.get("club_name", "")
+        if not isinstance(name, str):
+            raise ValueError(f"club_name for club {club_id} must be text.")
+        club["club_name"] = name.strip() or f"Club {club_id}"
+        clubs.append(club)
+    return clubs
+
+
+def default_club(config: dict) -> dict:
+    """The club the viewer opens on; a blank placeholder while none is configured."""
+    clubs = configured_clubs(config)
+    wanted = config.get("default_club_id")
+    if wanted is None or wanted == "":
+        if clubs:
+            return clubs[0]
+        blank = {k: v for k, v in config.items() if k not in ("clubs", "default_club_id")}
+        return {**blank, "club_id": "", "club_name": str(config.get("club_name") or "")}
+    if not isinstance(wanted, bool) and re.fullmatch(r"[0-9]+", str(wanted)):
+        for club in clubs:
+            if int(club["club_id"]) == int(str(wanted)):
+                return club
+    raise ValueError("default_club_id must be the club_id of a configured club.")
+
+
+def find_club(config: dict, club_id: str | None) -> dict:
+    """A configured club for commands that act on one archive."""
+    clubs = configured_clubs(config)
+    if not clubs:
+        raise ValueError("Set club_id before importing.")
+    if club_id is None:
+        return default_club(config)
+    for club in clubs:
+        if club["club_id"] == club_id:
+            return club
+    raise ValueError(f"Club {club_id} is not configured in config.json.")
+
+
+def club_identity(club: dict) -> dict:
+    """The only club settings the published viewer receives."""
+    return {key: club[key] for key in CLUB_KEYS}
+
+
+def club_label(club: dict) -> str:
+    return f"{club.get('club_name') or 'Club'} ({club['club_id']})"
 
 
 def mapping_reviewed(config: dict) -> bool:
@@ -151,7 +243,7 @@ def get_json(endpoint: str, params: dict, *, raw_sink: Callable | None = None) -
         raise EAError(f"EA returned HTTP {exc.code}.", code=exc.code,
                       retry_after=exc.headers.get("Retry-After", "")) from exc
     except (URLError, TimeoutError, OSError) as exc:
-        raise EAError(f"EA could not be reached: {exc}") from exc
+        raise EAError(f"EA could not be reached: {exc}", unreachable=True) from exc
     preserve(status, body, content_type)
     if len(body) > MAX_RESPONSE:
         raise EAError("EA response exceeded the safety size limit; truncated raw capture marked explicitly, no data imported.")
@@ -277,81 +369,175 @@ def cooldown_time(header: str, now: datetime) -> str:
             return stamp(now + timedelta(hours=6))
 
 
+def state_files(root: Path) -> list[Path]:
+    """The host-wide state file, then any written inside a club folder by single-club versions."""
+    return [root / "data" / "collector_state.json",
+            *sorted((root / "data").glob("*/*/*/collector_state.json"))]
+
+
+def access_state(root: Path) -> dict:
+    """EA's access denials and rate limits apply to this host, never to one club.
+
+    Every state file therefore counts for every club: switching clubs must not
+    become a way around a pause or a cooldown.
+    """
+    merged = {"halted": False, "reason": None, "cooldown_until": None}
+    for path in state_files(root):
+        state = read_json(path, {}) or {}
+        if state.get("halted"):
+            merged.update(halted=True, reason=merged["reason"] or state.get("reason"))
+        until = state.get("cooldown_until")
+        if until and (not merged["cooldown_until"] or datetime.fromisoformat(until)
+                      > datetime.fromisoformat(merged["cooldown_until"])):
+            merged["cooldown_until"] = until
+    return merged
+
+
+def update_states(root: Path, wanted: Callable[[dict], bool], **fields) -> None:
+    for path in state_files(root):
+        state = read_json(path)
+        if state and wanted(state):
+            state.update(fields)
+            write_json(path, state)
+
+
+def run_report(now: datetime, reports: dict[str, dict]) -> dict:
+    """Whole-run summary. `clubs` keeps each club's own status, counts and errors."""
+    rows = list(reports.values())
+    statuses = {r["status"] for r in rows}
+    if len(statuses) == 1:
+        status = statuses.pop()
+    else:
+        status = "partial" if any(r["results"] for r in rows) else "error"
+    if len(rows) == 1:
+        message, error = rows[0]["message"], rows[0]["error"]
+    else:
+        messages = {r["message"] for r in rows}
+        message = messages.pop() if len(messages) == 1 else " ".join(
+            f"{club_label(r)}: {r['message']}" for r in rows)
+        error = "; ".join(f"{club_label(r)}: {r['error']}" for r in rows if r["error"]) or None
+    return {"run_at": stamp(now), "status": status, "error": error, "message": message,
+            "last_api_attempt_at": max((r["last_api_attempt_at"] for r in rows
+                                        if r["last_api_attempt_at"]), default=None),
+            "needs_attention": any(r["needs_attention"] for r in rows), "clubs": reports}
+
+
+def status_lines(report: dict) -> list[str]:
+    """One line per club and match feed: records received, records changed, errors."""
+    lines = []
+    for club in report.get("clubs", {}).values():
+        label = club_label(club)
+        for match_type, result in club["results"].items():
+            lines.append(f"[{label}] {match_type}: received {result['received']}, changed {result['changed']}"
+                         + (" (possible gap)" if result.get("possible_gap") else ""))
+        if club["error"]:
+            lines.append(f"[{label}] {club.get('failed_match_type') or 'archive'}: ERROR {club['error']}")
+        elif not club["results"]:
+            lines.append(f"[{label}] {club['status']}: {club['message']}")
+    return lines
+
+
 def collect(root: Path, config: dict, *, event: str = "manual", resume: bool = False,
             fetch: Callable = get_json, pause: Callable = time.sleep) -> dict:
+    """One run over every configured club. A club's failure stays with that club."""
     now = utcnow()
-    report = {"run_at": stamp(now), "last_api_attempt_at": None,
-              "status": "not_requested", "error": None, "results": {},
-              "needs_attention": False, "message": "Viewer rebuilt without an API fetch."}
+    clubs = configured_clubs(config)
+    reports = {club["club_id"]: {
+        "club_id": club["club_id"], "club_name": club["club_name"], "run_at": stamp(now),
+        "last_api_attempt_at": None, "status": "not_requested", "error": None, "results": {},
+        "needs_attention": False, "message": "Viewer rebuilt without an API fetch."} for club in clubs}
+
+    def everyone(**fields) -> dict:
+        for report in reports.values():
+            report.update(fields)
+        return run_report(now, reports)
+
     if event == "push":
-        return report
-    if not config["club_id"]:
-        report.update(status="setup_required", message="Set your numeric club_id in config.json.",
-                      needs_attention=(event == "manual"))
-        return report
+        return run_report(now, reports)
+    if not clubs:
+        return {"run_at": stamp(now), "status": "setup_required", "error": None,
+                "message": "Set your numeric club_id in config.json.", "last_api_attempt_at": None,
+                "needs_attention": event == "manual", "clubs": {}}
     if event == "schedule" and not config["collection_enabled"]:
-        report.update(status="disabled", message="Scheduled collection is disabled in config.json.")
-        return report
-    folder = archive_dir(root, config)
-    state_path = folder / "collector_state.json"
-    state = read_json(state_path, {"halted": False, "reason": None, "cooldown_until": None})
+        return everyone(status="disabled", message="Scheduled collection is disabled in config.json.")
     if resume and event == "manual":
         # Resume clears a persistent access-denial pause, but NEVER ignores Retry-After.
-        state.update(halted=False, reason=None)
-        write_json(state_path, state)
-    if state.get("halted"):
-        report.update(status="blocked", needs_attention=True,
-                      message="Collection paused after access denial. Resolve it before a manual resume.")
-        return report
-    if state.get("cooldown_until"):
-        if datetime.fromisoformat(state["cooldown_until"]) > now:
-            report.update(status="cooldown", needs_attention=True,
-                          message="Rate-limit cooldown until " + state["cooldown_until"])
-            return report
-    store = ArchiveStore(folder, config)
-    try:
-        store.prepare()
-    except (ArchiveError, OSError) as exc:
-        report.update(status="error", needs_attention=True, error=str(exc),
-                      message="Archive integrity check failed. No API request made; no existing history overwritten.")
-        return report
-    report.update(status="success", message="Configured match feeds fetched successfully.")
-    for index, match_type in enumerate(config["match_types"]):
-        if index:
-            pause(2)
-        report["last_api_attempt_at"] = stamp()
+        update_states(root, lambda state: state.get("halted"), halted=False, reason=None)
+    state = access_state(root)
+    if state["halted"]:
+        return everyone(status="blocked", needs_attention=True,
+                        message="Collection paused after access denial. Resolve it before a manual resume.")
+    if state["cooldown_until"] and datetime.fromisoformat(state["cooldown_until"]) > now:
+        return everyone(status="cooldown", needs_attention=True,
+                        message="Rate-limit cooldown until " + state["cooldown_until"])
+    host_path = state_files(root)[0]
+    requests, fetched, denied = 0, False, False
+    # Set once EA denies, rate-limits or cannot be reached: the remaining clubs
+    # are not requested in this run.
+    stop = None
+    for club in clubs:
+        report = reports[club["club_id"]]
+        if stop:
+            report.update(stop, needs_attention=True)
+            continue
+        store = ArchiveStore(archive_dir(root, club), club)
         try:
-            params = {"platform": config["platform"], "clubIds": config["club_id"],
-                      "matchType": match_type, "maxResultCount": 10}
-            # Preserve successful/error HTTP response bytes before JSON decoding.
-            # Injected test clients use snapshots after their decoded return.
-            if fetch is get_json:
-                payload = fetch("clubs/matches", params, raw_sink=lambda code, body, ct, truncated:
-                    store.http_response(match_type, code, body, ct, truncated))
-            else:
-                payload = fetch("clubs/matches", params)
-            result = save_matches(root, config, match_type, payload)
-            report["results"][match_type] = result
-        except (EAError, ValueError, OSError) as exc:
-            report.update(status="partial" if report["results"] else "error",
-                          needs_attention=True, error=str(exc),
-                          message="Fetch failed. Existing archived matches have been kept.")
-            if isinstance(exc, EAError) and exc.code in (401, 403):
-                state.update(halted=True, reason=f"HTTP {exc.code}")
-                report["message"] += " Further automatic API calls are paused."
-            elif isinstance(exc, EAError) and exc.code == 429:
-                state["cooldown_until"] = cooldown_time(exc.retry_after, utcnow())
-                report["message"] += " A persistent rate-limit cooldown is active."
-            write_json(state_path, state)
-            break  # Do not hit the other endpoint after a failure/denial.
-    else:
-        if state.get("cooldown_until") or state.get("reason"):
-            state.update(halted=False, reason=None, cooldown_until=None)
-            write_json(state_path, state)
-    if any(r.get("possible_gap") for r in report["results"].values()):
-        report["message"] += " A full feed had no overlap with the archive: possible missing matches."
-        report["needs_attention"] = True
-    return report
+            store.prepare()
+        except (ArchiveError, OSError) as exc:
+            report.update(status="error", needs_attention=True, error=str(exc),
+                          message="Archive integrity check failed. No API request made; no existing history overwritten.")
+            continue
+        report.update(status="success", message="Configured match feeds fetched successfully.")
+        for match_type in club["match_types"]:
+            if requests:
+                pause(REQUEST_PAUSE)
+            requests += 1
+            report["last_api_attempt_at"] = stamp()
+            try:
+                params = {"platform": club["platform"], "clubIds": club["club_id"],
+                          "matchType": match_type, "maxResultCount": 10}
+                # Preserve successful/error HTTP response bytes before JSON decoding.
+                # Injected test clients use snapshots after their decoded return.
+                if fetch is get_json:
+                    payload = fetch("clubs/matches", params, raw_sink=lambda code, body, ct, truncated:
+                        store.http_response(match_type, code, body, ct, truncated))
+                else:
+                    payload = fetch("clubs/matches", params)
+                report["results"][match_type] = save_matches(root, club, match_type, payload)
+                fetched = True
+            except (EAError, ValueError, OSError) as exc:
+                report.update(status="partial" if report["results"] else "error",
+                              needs_attention=True, error=str(exc), failed_match_type=match_type,
+                              message="Fetch failed. Existing archived matches have been kept.")
+                code = exc.code if isinstance(exc, EAError) else None
+                where = f"while collecting {club_label(club)}"
+                if code in (401, 403):
+                    denied = True
+                    host = read_json(host_path, {"halted": False, "reason": None, "cooldown_until": None})
+                    host.update(halted=True, reason=f"HTTP {code}")
+                    write_json(host_path, host)
+                    report["message"] += " Further automatic API calls are paused."
+                    stop = {"status": "blocked", "message":
+                            f"Not requested: EA denied access (HTTP {code}) {where}. Collection is paused for every club."}
+                elif code == 429:
+                    denied = True
+                    host = read_json(host_path, {"halted": False, "reason": None, "cooldown_until": None})
+                    host["cooldown_until"] = cooldown_time(exc.retry_after, utcnow())
+                    write_json(host_path, host)
+                    report["message"] += " A persistent rate-limit cooldown is active."
+                    stop = {"status": "cooldown", "message":
+                            f"Not requested: EA rate-limited this host {where}. Cooldown until {host['cooldown_until']}."}
+                elif isinstance(exc, EAError) and exc.unreachable:
+                    stop = {"status": "skipped", "message": f"Not requested: EA could not be reached {where}."}
+                break  # Do not hit this club's other endpoint after a failure/denial.
+        if any(r.get("possible_gap") for r in report["results"].values()):
+            report["message"] += " A full feed had no overlap with the archive: possible missing matches."
+            report["needs_attention"] = True
+    if fetched and not denied:
+        # EA answered normally, so an expired cooldown or resumed pause is over.
+        update_states(root, lambda state: state.get("cooldown_until") or state.get("reason"),
+                      halted=False, reason=None, cooldown_until=None)
+    return run_report(now, reports)
 
 
 def completion_rate(completed: Any, attempted: Any) -> float | None:
@@ -453,7 +639,15 @@ def normalize_match(record: dict) -> dict:
             "last_changed_at": record["last_changed_at"]}
 
 
+def dataset_dir(root: Path, club: dict) -> Path:
+    # The club ID becomes a folder and URL segment of the published site.
+    if not re.fullmatch(r"[0-9]+", str(club["club_id"])):
+        raise ValueError("A viewer dataset needs a numeric club_id.")
+    return root / "site" / "data" / "clubs" / club["club_id"]
+
+
 def build(root: Path, config: dict, report: dict | None = None) -> dict:
+    """One club's viewer dataset, read only from that club's archive folder."""
     store = ArchiveStore(archive_dir(root, config), config)
     if store.inventory.exists() or store.journal.exists():
         store.verify()
@@ -465,28 +659,53 @@ def build(root: Path, config: dict, report: dict | None = None) -> dict:
             raise ValueError(f"Archive identity mismatch in {path.name}.")
         records.append(normalize_match(rec))
     records.sort(key=lambda r: (r["timestamp"] or "", r["id"]), reverse=True)
-    state = read_json(archive_dir(root, config) / "collector_state.json", {})
-    payload = {"schema_version": VIEWER_SCHEMA, "config": config, "decoder": DECODER,
+    # Only the club's public identity is published, never the rest of config.json.
+    payload = {"schema_version": VIEWER_SCHEMA, "club": club_identity(config), "decoder": DECODER,
                "mapping_reviewed": mapping_reviewed(config),
                "generated_at": stamp(), "collection": report or {"status": "archive_only"},
-               "persistent_state": state, "repository": os.environ.get("GITHUB_REPOSITORY", ""),
+               "persistent_state": access_state(root), "repository": os.environ.get("GITHUB_REPOSITORY", ""),
                "archive_updated_at": max((m["last_changed_at"] for m in records), default=None),
                "matches": records}
-    write_json(root / "site/data/index.json", payload)
+    write_json(dataset_dir(root, config) / "index.json", payload)
     return payload
 
 
+def build_site(root: Path, config: dict, report: dict | None = None) -> dict[str, dict]:
+    """Every club's dataset and CSV, plus the catalog that fills the club selector."""
+    reports = (report or {}).get("clubs", {})
+    payloads, errors = {}, []
+    for club in configured_clubs(config):
+        try:
+            payload = build(root, club, reports.get(club["club_id"]))
+            export_csv(root, payload)
+            payloads[club["club_id"]] = payload
+        except (ValueError, OSError) as exc:
+            errors.append(f"{club_label(club)}: {exc}")
+    write_json(root / "site/data/clubs.json", {
+        "schema_version": 1, "default_club_id": default_club(config)["club_id"],
+        "generated_at": stamp(), "clubs": [club_identity(club) for club in configured_clubs(config)]})
+    # Single-club versions generated these two files. A leftover copy would keep
+    # serving one club's numbers outside the selector.
+    for legacy in ("index.json", "player_matches.csv"):
+        (root / "site/data" / legacy).unlink(missing_ok=True)
+    if errors:
+        raise ValueError("Viewer data could not be built. " + "; ".join(errors))
+    return payloads
+
+
 def export_csv(root: Path, payload: dict) -> Path:
-    path = root / "site/data/player_matches.csv"
+    club = payload["club"]
+    path = dataset_dir(root, club) / f"player_matches_{club['club_id']}.csv"
     path.parent.mkdir(parents=True, exist_ok=True)
-    fields = ["match_id", "timestamp", "match_types", "player_id", "player_name", "position",
-              *CSV_STATS, "events_status", "data_warnings", "decoder", "mapping_reviewed"]
+    fields = ["club_id", "club_name", "match_id", "timestamp", "match_types", "player_id", "player_name",
+              "position", *CSV_STATS, "events_status", "data_warnings", "decoder", "mapping_reviewed"]
     with path.open("w", newline="", encoding="utf-8-sig") as handle:
         writer = csv.DictWriter(handle, fieldnames=fields)
         writer.writeheader()
         for match in payload["matches"]:
             for p in match["players"]:
-                row = {"match_id": match["id"], "timestamp": match["timestamp"],
+                row = {"club_id": club["club_id"], "club_name": club["club_name"],
+                       "match_id": match["id"], "timestamp": match["timestamp"],
                        "match_types": ",".join(match["match_types"]),
                        "player_id": p["id"], "player_name": p["name"]}
                 row.update({key: p[key] for key in fields if key in p})
@@ -518,7 +737,8 @@ def migrate_sqlite(root: Path, config: dict, path: Path) -> int:
 
 
 def stores_for_root(root: Path, config: dict) -> list[ArchiveStore]:
-    folders = {archive_dir(root, config)} if config["club_id"] else set()
+    """Every configured club plus any other archive already on disk."""
+    folders = {archive_dir(root, club) for club in configured_clubs(config)}
     for pattern in ("*/*/*/matches", "*/*/*/integrity.json"):
         for path in (root / "data").glob(pattern):
             folders.add(path.parent)
@@ -529,11 +749,38 @@ def stores_for_root(root: Path, config: dict) -> list[ArchiveStore]:
     return stores
 
 
-def archive_check(root: Path, config: dict, *, protect: bool = False) -> dict:
+def archive_report(root: Path, config: dict, *, protect: bool = False) -> dict:
+    """Check each club archive on its own, so one failure never hides another club's result."""
+    names = {archive_dir(root, club): club["club_name"] for club in configured_clubs(config)}
     stores = stores_for_root(root, config)
     if not stores:
         raise ArchiveError("No configured club or archive to check.")
-    return {"status": "ok", "archives": [s.prepare() if protect else s.verify() for s in stores]}
+    archives = []
+    for store in stores:
+        entry = {**store.identity, "club_name": names.get(store.folder),
+                 "path": store.folder.relative_to(root).as_posix()}
+        try:
+            entry.update(store.prepare() if protect else store.verify())
+        except (ValueError, OSError, KeyError, TypeError) as exc:
+            entry.update(status="error", error=str(exc))
+        archives.append(entry)
+    healthy = all(entry["status"] == "ok" for entry in archives)
+    return {"status": "ok" if healthy else "error", "archives": archives}
+
+
+def archive_failures(report: dict) -> str:
+    return "; ".join(f"club {a['club_id']} ({a['path']}): {a['error']}"
+                     for a in report["archives"] if a["status"] != "ok")
+
+
+def archive_check(root: Path, config: dict, *, protect: bool = False) -> dict:
+    """archive_report, but any unhealthy archive is an error. `.report` has every club."""
+    report = archive_report(root, config, protect=protect)
+    if report["status"] != "ok":
+        error = ArchiveError("Archive check failed for " + archive_failures(report))
+        error.report = report
+        raise error
+    return report
 
 
 def run_main() -> int:
@@ -557,18 +804,24 @@ def run_main() -> int:
     imp.add_argument("--match-type", choices=MATCH_TYPES, default="leagueMatch")
     mig = sub.add_parser("import-sqlite", help="Migrate the previous fc_clubs.sqlite3 archive")
     mig.add_argument("file", type=Path)
+    for command in (imp, mig):
+        command.add_argument("--club", metavar="CLUB_ID", help="Configured club to import into (default: default club)")
     args = parser.parse_args()
     try:
         config = load_config()
         report_path = ROOT / ".runtime/report.json"
         if args.command == "search":
-            print(json.dumps(get_json("allTimeLeaderboard/search", {"platform": config["platform"],
+            print(json.dumps(get_json("allTimeLeaderboard/search", {"platform": default_club(config)["platform"],
                             "clubName": args.name}), indent=2, ensure_ascii=False))
             return 0
         if args.command == "check-status":
             return int(bool(read_json(report_path, {}).get("needs_attention")))
         if args.command == "verify":
-            print(json.dumps(archive_check(ROOT, config), indent=2))
+            checked = archive_report(ROOT, config)
+            print(json.dumps(checked, indent=2))
+            if checked["status"] != "ok":
+                print("Error: Archive check failed for " + archive_failures(checked), file=sys.stderr)
+                return 1
             return 0
         if args.command == "backup":
             archive_check(ROOT, config, protect=True)
@@ -578,22 +831,27 @@ def run_main() -> int:
             print(json.dumps(verify_backup(args.file), indent=2))
             return 0
         if args.command in ("import-json", "import-sqlite"):
-            if not config["club_id"]:
-                raise ValueError("Set club_id before importing.")
+            club = find_club(config, args.club)
             if args.command == "import-json":
                 if not args.file.is_file():
                     raise ValueError("Input JSON file does not exist.")
-                print(save_matches(ROOT, config, args.match_type, read_json(args.file)))
+                print(save_matches(ROOT, club, args.match_type, read_json(args.file)))
             else:
-                print("Imported/updated:", migrate_sqlite(ROOT, config, args.file))
+                print("Imported/updated:", migrate_sqlite(ROOT, club, args.file))
         report = None
         if args.command == "sync":
+            # Every accepted match is already on disk when collect returns; the
+            # viewer build and any failure report come afterwards.
             report = collect(ROOT, config, event=args.event, resume=args.resume)
             write_json(report_path, report)
             print(json.dumps(report, indent=2))
-        payload = build(ROOT, config, report)
-        export_csv(ROOT, payload)
-        print(f"Viewer contains {len(payload['matches'])} distinct archived matches.")
+            print("\n".join(status_lines(report)))
+        payloads = build_site(ROOT, config, report)
+        for payload in payloads.values():
+            print(f"Viewer contains {len(payload['matches'])} distinct archived matches "
+                  f"for {club_label(payload['club'])}.")
+        if not payloads:
+            print("Viewer contains no club yet. Set club_id in config.json.")
         if report and report["needs_attention"] and not args.defer_failure:
             return 1
         return 0

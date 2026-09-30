@@ -1,9 +1,14 @@
 "use strict";
 const $ = id => document.getElementById(id);
-const S = window.ClubStats;
+const S = window.ClubStats, C = window.ClubCatalog;
 const format = (n, digits = 0) => S.finite(n) ? n.toLocaleString(undefined, {maximumFractionDigits: digits, minimumFractionDigits: digits}) : "—";
 const labels = {leagueMatch: "League", playoffMatch: "Playoffs", friendlyMatch: "Friendly"};
-let archive, activeView = "overview", sortKey = "goals", sortDirection = -1, matchLimit = 20;
+const STORAGE_KEY = "dubsfc-tracker.club", NO_DATA = {matches: []};
+// `archive` only ever holds the selected club's own dataset. It is NO_DATA while
+// that dataset loads or after it fails, never another club's numbers.
+let catalog = {default_club_id: "", clubs: []}, club = null, archive = NO_DATA, phase = "loading";
+let demo = false, loadRun = 0, loadAbort = null;
+let activeView = "overview", sortKey = "goals", sortDirection = -1, matchLimit = 20;
 function node(tag, text, className) {
   const e = document.createElement(tag);
   if (text !== undefined) e.textContent = text;
@@ -17,6 +22,13 @@ function dateText(value) {
 }
 function filteredMatches() {
   return S.filterMatches(archive.matches, {period: $("period").value, competition: $("competition").value});
+}
+function emptyText() {
+  if (archive.matches.length) return "No archived matches match this filter.";
+  if (phase === "setup") return "No club configured yet. Set your club ID in config.json, then run the collector.";
+  if (phase === "loading") return club ? `Loading ${club.club_name}…` : "Loading…";
+  if (phase === "failed") return club ? `Statistics for ${club.club_name} could not be loaded.` : "Statistics could not be loaded.";
+  return `No matches archived yet for ${club.club_name}. They appear here after the collector's next successful run.`;
 }
 function visiblePlayers(matches) {
   const query = $("player-search").value.trim().toLocaleLowerCase();
@@ -91,7 +103,7 @@ function renderPlayers(matches) {
       "td",
       matches.length
         ? "No player records match this filter."
-        : "No matches archived yet. Set your club ID, then run the collector.",
+        : emptyText(),
       "empty"
     );
 
@@ -180,7 +192,7 @@ function miniTable(match, view) {
 function renderMatches(matches) {
   const list = $("match-list"), opened = new Set([...list.querySelectorAll(".match-item[open]")].map(el => el.dataset.matchId));
   list.replaceChildren(); $("matches-label").textContent = `${matches.length} matches · most recent first`;
-  if (!matches.length) list.append(node("div", "Your saved matches will appear here. Only archived or imported matches are shown.", "empty"));
+  if (!matches.length) list.append(node("div", emptyText(), "empty"));
   for (const m of matches.slice(0, matchLimit)) {
     const detail = node("details", undefined, "match-item"), summary = node("summary"); detail.dataset.matchId = m.id;
     summary.append(node("span", m.result || "?", `result ${["W", "D", "L"].includes(m.result) ? m.result : ""}`), node("span", dateText(m.timestamp), "match-time"),
@@ -265,60 +277,147 @@ function selectView(key, focus = false) {
   renderPlayers(filteredMatches());
 }
 function exportCurrentView() {
-  const csv = S.tableCsv(visiblePlayers(filteredMatches()), activeView, {perMatch: $("per-match").checked});
+  const perMatch = $("per-match").checked;
+  const csv = S.tableCsv(visiblePlayers(filteredMatches()), activeView, {perMatch, club});
   const blob = new Blob([csv], {type: "text/csv;charset=utf-8"});
   const url = URL.createObjectURL(blob), link = node("a");
-  link.href = url; link.download = `club-${activeView}-${$("per-match").checked ? "per-match" : "totals"}.csv`;
+  link.href = url; link.download = `${club ? C.fileSlug(club) : "club"}-${activeView}-${perMatch ? "per-match" : "totals"}.csv`;
   document.body.append(link); link.click(); link.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
+function renderIdentity() {
+  $("club-name").textContent = club ? club.club_name : "Your club";
+  $("edition").textContent = club ? `${club.edition.toUpperCase()} / ${club.platform.toUpperCase()} / CLUB ${club.club_id}` : "EA CLUBS / CLUB NOT CONFIGURED";
+}
+function renderStatus() {
+  const ready = phase === "ready";
+  // Keep synthetic payloads visibly labelled even if copied to another path.
+  const synthetic = demo || archive.collection?.status === "demo";
+  $("demo-banner").hidden = !synthetic;
+  const report = archive.collection || {}, pill = $("status-pill"), status = report.status || "unknown", halted = archive.persistent_state?.halted;
+  const needsNotice = ready && !synthetic && (report.needs_attention || halted || ["error", "partial", "blocked", "cooldown", "skipped"].includes(status));
+  $("collector-health").hidden = !needsNotice;
+  pill.textContent = needsNotice ? (halted ? "Paused: access denied" : status.replaceAll("_", " ")) : "";
+  pill.className = "pill" + (status === "success" && !halted ? " good" : report.needs_attention || halted ? " bad" : "");
+  $("health-text").textContent = needsNotice ? (report.message || "Check the collector log.") : "";
+  $("freshness").textContent = report.last_api_attempt_at ? "API attempt: " + dateText(report.last_api_attempt_at) : "";
+  $("archive-stamp").textContent = !ready ? "" : synthetic ? "Synthetic data · not your club records"
+    : archive.archive_updated_at ? `${club.club_name} archive changed: ${dateText(archive.archive_updated_at)}` : `${club.club_name} archive is empty`;
+  const log = $("log-link"), repository = archive.repository;
+  log.hidden = !(ready && repository && /^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(repository));
+  if (!log.hidden) log.href = `https://github.com/${repository}/actions/workflows/archive-and-publish.yml`;
+  const all = $("export");
+  all.hidden = !ready || synthetic;
+  if (!all.hidden) {all.href = C.csvPath(catalog, club.club_id); all.download = `${C.fileSlug(club)}-player-matches.csv`;}
+}
+function renderFailure(error) {
+  $("collector-health").hidden = false;
+  $("status-pill").textContent = "Data unavailable";
+  $("health-text").textContent = club ? `The viewer could not load the generated data for ${club.club_name}.` : "The viewer could not load its generated data.";
+  const box = $("load-error"); box.hidden = false;
+  box.textContent = error.message + " Run python scripts/tracker.py build, then preview with python -m http.server --directory site. On GitHub, inspect the Actions log.";
+}
+function renderAll() {
+  renderIdentity(); renderStatus(); render();
+}
+function fillSelector() {
+  const names = catalog.clubs.map(entry => entry.club_name);
+  // Same-named clubs stay distinguishable by ID.
+  $("club-select").replaceChildren(...catalog.clubs.map(entry => new Option(
+    names.indexOf(entry.club_name) === names.lastIndexOf(entry.club_name) ? entry.club_name : `${entry.club_name} (${entry.club_id})`, entry.club_id)));
+  $("club-picker").hidden = catalog.clubs.length < 2;
+}
+function reconcileFilters() {
+  // The competition and player search depend on the club just loaded; a value
+  // that selects nothing there would look like an empty archive.
+  const competition = $("competition"), search = $("player-search");
+  if (competition.value !== "all" && !archive.matches.some(m => (m.match_types || []).includes(competition.value))) competition.value = "all";
+  const query = search.value.trim().toLocaleLowerCase();
+  if (query && !archive.matches.some(m => (m.players || []).some(p => String(p.name || "").toLocaleLowerCase().includes(query)))) search.value = "";
+}
+function checkDataset(data, expected) {
+  if (!data || ![1, 2].includes(data.schema_version) || !Array.isArray(data.matches)) throw new Error("Unexpected viewer data format.");
+  // A dataset served from one club's path must say it belongs to that club.
+  const owner = data.club || data.config || {};
+  if (String(owner.club_id) !== expected.club_id) throw new Error(`The published data does not belong to ${expected.club_name}.`);
+}
+async function getJson(url, signal) {
+  const response = await fetch(url, {cache: "no-store", signal});
+  if (!response.ok) throw new Error(`Data request returned HTTP ${response.status}.`);
+  return response.json();
+}
+async function showClub(next, {remember = false, address = false} = {}) {
+  const run = ++loadRun;
+  if (loadAbort) loadAbort.abort();
+  loadAbort = new AbortController();
+  // Blank the page before fetching: the previous club's numbers, open match
+  // details and errors must not sit under the new club's name.
+  club = next; archive = NO_DATA; phase = "loading"; matchLimit = 20;
+  $("match-list").replaceChildren(); $("load-error").hidden = true;
+  $("club-select").value = club.club_id;
+  if (remember) try {localStorage.setItem(STORAGE_KEY, club.club_id);} catch {}
+  if (address) try {
+    const url = new URL(location.href); url.searchParams.set("club", club.club_id);
+    history.replaceState(null, "", url);
+  } catch {}
+  renderAll();
+  let data = null, failure = null;
+  try {
+    data = await getJson(C.dataPath(catalog, next.club_id), loadAbort.signal);
+    checkDataset(data, next);
+  } catch (error) {
+    failure = error;
+  }
+  // A newer selection owns the page now; this late answer is dropped.
+  if (run !== loadRun) return;
+  if (failure) {phase = "failed"; renderAll(); renderFailure(failure); return;}
+  archive = data; phase = "ready";
+  reconcileFilters(); renderAll();
+}
+function wire() {
+  $("club-select").addEventListener("change", event => {
+    const next = C.findClub(catalog, event.target.value);
+    if (next) showClub(next, {remember: true, address: true});
+  });
+  for (const id of ["period", "competition", "per-match"]) $(id).addEventListener("change", () => {matchLimit = 20; render();});
+  $("player-search").addEventListener("input", () => renderPlayers(filteredMatches()));
+  $("player-head").addEventListener("click", event => {
+    const button = event.target.closest("button[data-sort]"); if (!button) return;
+    const key = button.dataset.sort; sortDirection = key === sortKey ? -sortDirection : key === "name" ? 1 : -1; sortKey = key;
+    renderPlayers(filteredMatches());
+  });
+  document.querySelectorAll("[data-view]").forEach(button => button.addEventListener("click", () => selectView(button.dataset.view)));
+  $("stat-tabs").addEventListener("keydown", event => {
+    const keys = Object.keys(S.VIEWS), index = keys.indexOf(activeView);
+    const next = {ArrowRight: (index + 1) % keys.length, ArrowLeft: (index + keys.length - 1) % keys.length, Home: 0, End: keys.length - 1}[event.key];
+    if (next !== undefined) {event.preventDefault(); selectView(keys[next], true);}
+  });
+  $("more-matches").addEventListener("click", () => {matchLimit += 20; renderMatches(filteredMatches());});
+  $("export-view").addEventListener("click", exportCurrentView);
+}
 async function init() {
-  let demo = new URLSearchParams(location.search).get("demo") === "1";
+  wire();
+  const params = new URLSearchParams(location.search);
+  demo = params.get("demo") === "1";
   $("demo-banner").hidden = !demo;
   try {
-    const response = await fetch(demo ? "demo.json" : "data/index.json", {cache: "no-store"});
-    if (!response.ok) throw new Error(`Data request returned HTTP ${response.status}.`);
-    archive = await response.json();
-    // Keep synthetic payloads visibly labelled even if copied to another path.
-    if (archive.collection?.status === "demo") {demo = true; $("demo-banner").hidden = false;}
-    if (![1, 2].includes(archive.schema_version) || !Array.isArray(archive.matches)) throw new Error("Unexpected viewer data format.");
-    const config = archive.config;
-    $("club-name").textContent = config.club_name || "Your club";
-    document.title = "DubsFC Tracker";
-    $("edition").textContent = `${config.edition.toUpperCase()} / ${config.platform.toUpperCase()} / CLUB ${config.club_id || "NOT CONFIGURED"}`;
-    const report = archive.collection || {}, pill = $("status-pill"), status = report.status || "unknown", halted = archive.persistent_state?.halted;
-    const needsNotice = !demo && (report.needs_attention || halted || ["error", "partial", "blocked", "cooldown"].includes(status));
-    $("collector-health").hidden = !needsNotice;
-    pill.textContent = needsNotice ? (halted ? "Paused: access denied" : status.replaceAll("_", " ")) : "";
-    pill.className = "pill" + (status === "success" && !halted ? " good" : report.needs_attention || halted ? " bad" : "");
-    $("health-text").textContent = needsNotice ? (report.message || "Check the collector log.") : "";
-    $("freshness").textContent = report.last_api_attempt_at ? "API attempt: " + dateText(report.last_api_attempt_at) : "";
-    $("archive-stamp").textContent = demo ? "Synthetic data · not your club records" : archive.archive_updated_at ? "Archive changed: " + dateText(archive.archive_updated_at) : "Archive is empty";
-    if (archive.repository && /^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(archive.repository)) {
-      const link = $("log-link"); link.href = `https://github.com/${archive.repository}/actions/workflows/archive-and-publish.yml`; link.hidden = false;
+    if (demo) {
+      // The demo is one synthetic club in one file; it has no catalog to switch in.
+      const data = await getJson("demo.json");
+      catalog = C.parseCatalog({clubs: [data.club || data.config]});
+      club = catalog.clubs[0]; checkDataset(data, club);
+      archive = data; phase = "ready";
+      fillSelector(); renderAll();
+      return;
     }
-    if (demo) $("export").hidden = true;
-    render();
-    for (const id of ["period", "competition", "per-match"]) $(id).addEventListener("change", () => {matchLimit = 20; render();});
-    $("player-search").addEventListener("input", () => renderPlayers(filteredMatches()));
-    $("player-head").addEventListener("click", event => {
-      const button = event.target.closest("button[data-sort]"); if (!button) return;
-      const key = button.dataset.sort; sortDirection = key === sortKey ? -sortDirection : key === "name" ? 1 : -1; sortKey = key;
-      renderPlayers(filteredMatches());
-    });
-    document.querySelectorAll("[data-view]").forEach(button => button.addEventListener("click", () => selectView(button.dataset.view)));
-    $("stat-tabs").addEventListener("keydown", event => {
-      const keys = Object.keys(S.VIEWS), index = keys.indexOf(activeView);
-      const next = {ArrowRight: (index + 1) % keys.length, ArrowLeft: (index + keys.length - 1) % keys.length, Home: 0, End: keys.length - 1}[event.key];
-      if (next !== undefined) {event.preventDefault(); selectView(keys[next], true);}
-    });
-    $("more-matches").addEventListener("click", () => {matchLimit += 20; renderMatches(filteredMatches());});
-    $("export-view").addEventListener("click", exportCurrentView);
+    catalog = C.parseCatalog(await getJson("data/clubs.json"));
   } catch (error) {
-    $("collector-health").hidden = false;
-    $("status-pill").textContent = "Data unavailable";
-    $("health-text").textContent = "The viewer could not load its generated data.";
-    const box = $("load-error"); box.hidden = false;
-    box.textContent = error.message + " Run python scripts/tracker.py build, then preview with python -m http.server --directory site. On GitHub, inspect the Actions log.";
+    phase = "failed"; renderAll(); renderFailure(error);
+    return;
   }
+  fillSelector();
+  if (!catalog.clubs.length) {phase = "setup"; renderAll(); return;}
+  let remembered = null;
+  try {remembered = localStorage.getItem(STORAGE_KEY);} catch {}
+  await showClub(C.resolveClub(catalog, {requested: params.get("club"), remembered}));
 }
 init();

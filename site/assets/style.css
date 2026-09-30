@@ -255,3 +255,30 @@ td.column-best {
   color: var(--muted);
   font-weight: 400;
 }
+
+/* Club selector: sits under the club name it controls. */
+.club-picker {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 10px;
+  letter-spacing: .7px;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+.club-picker select {
+  min-width: 210px;
+  max-width: 100%;
+  color: var(--text);
+  background: var(--panel);
+  border: 1px solid var(--accent);
+  padding: 9px 30px 9px 12px;
+  border-radius: 7px;
+  font-size: 13px;
+  font-weight: 650;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+@media(max-width:700px){.club-picker{display:flex}.club-picker select{flex:1;min-width:0}}

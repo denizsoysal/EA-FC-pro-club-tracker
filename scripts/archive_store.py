@@ -327,7 +327,17 @@ def verify_backup(path: Path) -> dict:
                 raise ArchiveError("Unsafe backup path.")
             if metadata(z.read(relative)) != info:
                 raise ArchiveError(f"Backup checksum mismatch: {relative}")
-    return {"status": "ok", "backup": str(path), "files_checked": len(expected)}
+    # Counted from the ZIP's own checked file list, one entry per club archive.
+    clubs = {}
+    for relative in sorted(expected):
+        parts = PurePosixPath(relative).parts
+        if len(parts) >= 5 and parts[0] == "data":
+            club = clubs.setdefault(parts[1:4], {"edition": parts[1], "platform": parts[2],
+                                                 "club_id": parts[3], "files": 0, "matches": 0})
+            club["files"] += 1
+            club["matches"] += parts[4] == "matches"
+    return {"status": "ok", "backup": str(path), "files_checked": len(expected),
+            "clubs": list(clubs.values())}
 
 
 def create_backup(root: Path, destination: Path | None = None) -> dict:

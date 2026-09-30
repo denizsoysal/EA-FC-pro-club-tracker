@@ -3,6 +3,21 @@
   "club_id": "696276",
   "platform": "common-gen5",
   "edition": "fc27",
+  "default_club_id": "696276",
+  "clubs": [
+    {
+      "club_id": "696276",
+      "club_name": "Dubs VzeDoux",
+      "platform": "common-gen5",
+      "edition": "fc27"
+    },
+    {
+      "club_id": "976704",
+      "club_name": "FEN V12",
+      "platform": "common-gen5",
+      "edition": "fc27"
+    }
+  ],
   "match_types": [
     "leagueMatch",
     "playoffMatch"

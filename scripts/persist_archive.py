@@ -14,7 +14,7 @@ import sys
 import time
 
 from archive_store import ArchiveError, create_backup, repository_lock
-from tracker import load_config, archive_check
+from tracker import load_config, archive_report, archive_failures
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -27,12 +27,12 @@ def git(root: Path, *args: str, check: bool = True) -> subprocess.CompletedProce
 
 
 
-def verify_git_index(root: Path) -> None:
+def verify_git_index(root: Path, paths: list[str]) -> None:
     """Reject any line-ending/filter transformation between disk and staged blobs."""
     algorithm = git(root, "rev-parse", "--show-object-format").stdout.strip()
     if algorithm not in ("sha1", "sha256"):
         raise ArchiveError("Unknown Git object hash format.")
-    for record in git(root, "ls-files", "--stage", "-z", "--", "data/").stdout.split("\0"):
+    for record in git(root, "ls-files", "--stage", "-z", "--", *paths).stdout.split("\0"):
         if not record:
             continue
         meta, relative = record.split("\t", 1)
@@ -47,6 +47,22 @@ def verify_git_index(root: Path) -> None:
                                + ". Install the supplied .gitattributes; no archive commit was made.")
 
 
+def committable(root: Path, *, protect: bool = False) -> tuple[list[str], str]:
+    """Paths safe to commit, and a description of any archive that is not.
+
+    With every club healthy this is all of data/. Otherwise only the verified
+    club folders: one club's damage must not strand another club's new matches
+    on a runner, and the damaged folder is left exactly as found.
+    """
+    report = archive_report(root, load_config(root), protect=protect)
+    if report["status"] == "ok":
+        return ["data/"], ""
+    paths = [entry["path"] + "/" for entry in report["archives"] if entry["status"] == "ok"]
+    if paths and (root / "data" / "collector_state.json").is_file():
+        paths.append("data/collector_state.json")
+    return paths, archive_failures(report)
+
+
 def persist(root: Path, branch: str, *, pause=time.sleep) -> dict:
     git(root, "check-ref-format", "--branch", branch)
     # This ZIP intentionally copies all bytes even when integrity verification
@@ -54,17 +70,18 @@ def persist(root: Path, branch: str, *, pause=time.sleep) -> dict:
     from datetime import datetime, timezone
     name = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S_%fZ")
     backup = create_backup(root, root / ".runtime" / "recovery" / f"dubsfc-{name}.zip")
-    config = load_config(root)
-    archive_check(root, config, protect=True)
+    paths, failures = committable(root, protect=True)
+    if not paths:
+        raise ArchiveError("Archive check failed for " + failures)
     # Refuse accidental raw-history deletions instead of committing them.
-    deleted = git(root, "diff", "HEAD", "--name-only", "--diff-filter=D", "--", "data/").stdout.strip()
+    deleted = git(root, "diff", "HEAD", "--name-only", "--diff-filter=D", "--", *paths).stdout.strip()
     if deleted:
         raise ArchiveError("Refusing to commit deleted archive files: " + deleted)
     staged = git(root, "diff", "--cached", "--name-only").stdout.splitlines()
     if any(not p.startswith("data/") for p in staged):
         raise ArchiveError("Unexpected staged code/config changes. Only data/ is committed by the collector.")
-    git(root, "add", "--", "data/")
-    verify_git_index(root)
+    git(root, "add", "--", *paths)
+    verify_git_index(root, paths)
     changed = bool(git(root, "diff", "--cached", "--name-only", "--", "data/").stdout.strip())
     if changed:
         git(root, "-c", "user.name=github-actions[bot]", "-c",
@@ -78,6 +95,10 @@ def persist(root: Path, branch: str, *, pause=time.sleep) -> dict:
     for attempt in range(3):
         push = git(root, "push", "origin", f"HEAD:refs/heads/{branch}", check=False)
         if not push.returncode:
+            if failures:
+                # Reported only now, after every verified club is safely pushed.
+                raise ArchiveError("Verified club archives were committed and pushed. NOT committed, "
+                                   "left untouched for recovery: " + failures)
             return {"status": "pushed", "new_commit": changed, "recovery_zip": backup["backup"]}
         if attempt == 2:
             raise ArchiveError("Git push failed; raw data remains in the recovery ZIP. " + push.stderr.strip())
@@ -88,8 +109,10 @@ def persist(root: Path, branch: str, *, pause=time.sleep) -> dict:
             raise ArchiveError("Concurrent archive edits could not be merged safely. No force-push used. Download the recovery ZIP.")
         # A nonconflicting remote code/README change is safe. Validate the merged
         # archive before it can be pushed or used by the published viewer.
-        archive_check(root, load_config(root))
-        verify_git_index(root)
+        merged, problems = committable(root)
+        if any(path not in merged for path in paths):
+            raise ArchiveError("The merged archive failed verification; nothing pushed. " + problems)
+        verify_git_index(root, paths)
         pause(2 * (attempt + 1))
     raise ArchiveError("Unreachable persistence state")
 

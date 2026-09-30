@@ -65,6 +65,52 @@ See [START_HERE.md](START_HERE.md) for the short setup sequence, and
 [PACKAGE_VERIFICATION.md](PACKAGE_VERIFICATION.md) for checks executed on this
 complete distribution.
 
+## Several clubs
+
+One repository, one website and one scheduled workflow can archive several
+clubs. List them in `config.json`; every other setting is shared:
+
+```json
+{
+  "default_club_id": "696276",
+  "clubs": [
+    {"club_id": "696276", "club_name": "Dubs VzeDoux", "platform": "common-gen5", "edition": "fc27"},
+    {"club_id": "976704", "club_name": "FEN V12", "platform": "common-gen5", "edition": "fc27"}
+  ],
+  "match_types": ["leagueMatch", "playoffMatch"],
+  "collection_enabled": true,
+  "advanced_mapping_confirmed": true
+}
+```
+
+- A `clubs` list is authoritative. Old top-level `club_id`, `club_name`,
+  `platform` and `edition` may stay beside it (older code still reads them) but
+  are ignored, so no club is collected twice. Top-level `platform` and `edition`
+  only fill in a club entry that omits them.
+- Without `clubs`, the single-club configuration works exactly as before.
+- Each `club_id` must be numeric and listed once. `default_club_id` must name a
+  listed club; if omitted, the first club is the default.
+- `collection_enabled`, `match_types` and the mapping settings apply to every club.
+
+Each club has its own archive folder, checksum inventory, revisions, snapshots
+and transaction journal under `data/<edition>/<platform>/<club_id>/`. Adding a
+club creates a new folder; it never rewrites another club's files. When two
+configured clubs play each other, the match is stored in both folders, each
+read from its own club's side.
+
+One `sync` requests each club once per match type, in order, with a pause
+between every request. A failure that belongs to one club (a rejected feed, a
+server error, a damaged archive) is reported for that club and the next club is
+still collected. An access denial (401/403) or rate limit (429) belongs to the
+host: the run stops there and no other club is requested until the pause or
+cooldown ends. If EA cannot be reached at all, the remaining clubs are skipped
+for that run only.
+
+The viewer shows a **Club** selector under the club name when more than one
+club is configured. It loads only the selected club's published dataset, never
+calls EA, and supports shareable links such as `?club=976704`. The last choice
+is remembered in the browser; a valid `?club=` address takes precedence.
+
 ## Viewer
 
 Brand and browser title: **DubsFC Tracker**. No hero slogan, explanatory-card
@@ -99,11 +145,11 @@ See [stat definitions](docs/STAT_DEFINITIONS.md).
 # Search only; no match collection.
 python scripts/tracker.py search "Dubs VzeDoux"
 
-# Your current numeric club ID belongs in config.json: "club_id": "696276"
-# One manual fetch + durable archive write + viewer rebuild.
+# Numeric club IDs belong in config.json, in "clubs" or the single "club_id".
+# One manual fetch of EVERY configured club + durable archive write + viewer rebuild.
 python scripts/tracker.py sync
 
-# Read and checksum the protected archive; no EA request.
+# Read and checksum every club's protected archive, reported per club; no EA request.
 python scripts/tracker.py verify
 
 # Whole data/ + config backup, ZIP CRC and per-file SHA-256 checked.
@@ -116,20 +162,44 @@ python scripts/tracker.py verify-backup "E:\DubsFC\backup-2026-09-28.zip"
 
 `sync` is the command name. There is no `collect` command or `--dry-run` option.
 `collection_enabled` controls scheduled runs, not deliberate manual syncs.
+`sync` prints one line per club and match type with the records received and
+changed, or the error. `verify` exits non-zero if any club fails and still
+prints every club's result. A newly added club has no checksum baseline until
+its first `sync` or `backup`; `verify` says so rather than reporting it healthy.
+`import-json` and `import-sqlite` take `--club CLUB_ID` (default: the default club).
 
 ## Raw history: what is saved
 
-For the configured club, platform and edition label:
+For each configured club, under its platform and edition label:
 
 ```text
-data/fc27/common-gen5/696276/
-├── matches/<match_id>.json                 latest accepted match record
-├── revisions/<match_id>/<sha256>.json      every distinct accepted version
-├── snapshots/<match_type>/<sha256>.json    entire decoded endpoint responses
-├── responses/<match_type>/<sha256>.json    captured HTTP response bodies
-├── integrity.json                         protected-file SHA-256 inventory
-└── collector_state.json                   pause / cooldown state, when needed
+data/
+├── collector_state.json                    host-wide pause / cooldown, when needed
+└── fc27/common-gen5/
+    ├── 696276/
+    │   ├── matches/<match_id>.json              latest accepted match record
+    │   ├── revisions/<match_id>/<sha256>.json   every distinct accepted version
+    │   ├── snapshots/<match_type>/<sha256>.json entire decoded endpoint responses
+    │   ├── responses/<match_type>/<sha256>.json captured HTTP response bodies
+    │   └── integrity.json                       protected-file SHA-256 inventory
+    └── 976704/
+        └── (the same layout, with its own inventory)
 ```
+
+A pause or cooldown written inside a club folder by an earlier single-club
+version is still honoured, and also applies to every club.
+
+The published site gets one dataset per club and a small catalog for the
+selector, generated into `site/data/` (not committed):
+
+```text
+site/data/clubs.json                                 club catalog
+site/data/clubs/<club_id>/index.json                 that club's viewer dataset
+site/data/clubs/<club_id>/player_matches_<club_id>.csv
+```
+
+Only each club's name, ID, platform and edition label are published from
+`config.json`. Backups and the rest of the configuration are not part of `site/`.
 
 All returned match/player/club fields are preserved, **including both teams,
 hidden stats, unrecognized keys, and all event buckets**. No field is discarded
@@ -176,10 +246,13 @@ configuration, and **all of `data/`**. Enable Pages with source **GitHub Actions
 Run the workflow manually first. After a hosted request works, enable
 `collection_enabled` in your config and commit that change.
 
-The workflow collects, makes a recovery ZIP, verifies, commits **only `data/`**,
-and performs a normal Git push **before** Pages deployment. Persistence runs
-even when the preceding viewer build fails. Concurrent non-conflicting edits
-can be rebased; archive conflicts are aborted, never force-pushed away.
+The workflow collects every configured club in one run, makes a recovery ZIP,
+verifies, commits **only `data/`**, and performs a normal Git push **before**
+Pages deployment. Persistence runs even when the preceding viewer build fails.
+Concurrent non-conflicting edits can be rebased; archive conflicts are aborted,
+never force-pushed away. If one club's archive fails verification, the other
+clubs' verified folders are still committed and pushed; the damaged folder is
+left untouched, the run fails, and the site is not redeployed until it is fixed.
 
 If the fetch/build step or Git persistence fails, the workflow attempts to upload
 `dubsfc-recovery-<run_id>-<attempt>` as an artifact. It has **14-day retention**,
@@ -210,10 +283,13 @@ public, including player identifiers and opponent information.
 
 ```powershell
 python -m unittest discover -s tests -v
-node --test tests/test_stats.cjs
+node --test tests/test_stats.cjs tests/test_clubs.cjs
 ```
 
 The Node tests are optional for using the tracker. Optional browser checks need
 Playwright and Chromium: `python tests/browser_smoke.py` (mocked fetch) or
-`python tests/browser_http.py` (actual loopback HTTP/CSP, on a machine that permits it).
-Neither of those browser test scripts calls EA.
+`python tests/browser_http.py` (actual loopback HTTP/CSP under a repository
+subpath, on a machine that permits it). Set `CHROME_BIN` to use an installed
+Chromium-based browser. Neither of those browser test scripts calls EA. The
+multi-club tests use synthetic clubs and mocked requests; they do not show that
+EA accepts any real club ID.

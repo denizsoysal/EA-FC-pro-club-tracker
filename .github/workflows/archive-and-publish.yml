@@ -85,7 +85,8 @@ jobs:
         run: |
           node --check site/assets/app.js
           node --check site/assets/stats.js
-          node --test tests/test_stats.cjs
+          node --check site/assets/clubs.js
+          node --test tests/test_stats.cjs tests/test_clubs.cjs
 
       - name: Fetch and build
         id: fetch

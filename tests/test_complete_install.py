@@ -68,7 +68,8 @@ class CompleteInstallTests(unittest.TestCase):
                 return result.stdout
 
             output = cli(mocked=True)
-            self.assertIn('Viewer contains 10 distinct archived matches.', output)
+            self.assertIn('Viewer contains 10 distinct archived matches for Synthetic Club (100).', output)
+            self.assertIn('[Synthetic Club (100)] leagueMatch: received 10, changed 10', output)
             self.assertIn('"status": "success"', output)
             folder = root / 'data/fc27/common-gen5/100'
             original = {p.name: p.read_bytes() for p in (folder / 'matches').glob('*.json')}
@@ -78,7 +79,8 @@ class CompleteInstallTests(unittest.TestCase):
             self.assertEqual(verify['revisions'], 10)
             self.assertEqual(verify['snapshots'], 2)
             self.assertEqual(verify['http_responses'], 2)
-            payload = json.loads((root / 'site/data/index.json').read_bytes())
+            payload = json.loads((root / 'site/data/clubs/100/index.json').read_bytes())
+            self.assertEqual(payload['club']['club_id'], '100')
             self.assertEqual(len(payload['matches']), 10)
             self.assertEqual(payload['matches'][0]['players'][0]['second_assists'], 2)
             self.assertEqual(payload['matches'][0]['players'][0]['dribbles_completed'], 9)

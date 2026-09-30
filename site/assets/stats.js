@@ -127,13 +127,15 @@
     if (/^\s*[=+@-]/.test(text)) text = "'" + text;
     return /[",\r\n]/.test(text) ? '"' + text.replaceAll('"', '""') + '"' : text;
   }
-  function tableCsv(players, view, {perMatch = false} = {}) {
+  function tableCsv(players, view, {perMatch = false, club = null} = {}) {
     const keys = VIEWS[view].keys;
-    const header = ["player_id", "player_name", "appearances", "mode"];
+    // With a club, every row names it: a saved file stays attributable on its own.
+    const owner = club ? [club.club_id, club.club_name] : [];
+    const header = [...(club ? ["club_id", "club_name"] : []), "player_id", "player_name", "appearances", "mode"];
     for (const key of keys) header.push(key, key + "_available_matches");
     const rows = [header];
     for (const p of players) {
-      const row = [p.id, p.name, p.appearances, perMatch ? "per_available_match" : "totals"];
+      const row = [...owner, p.id, p.name, p.appearances, perMatch ? "per_available_match" : "totals"];
       for (const key of keys) row.push(p[key], p.counts[key] || 0);
       rows.push(row);
     }

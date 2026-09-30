@@ -6,9 +6,10 @@
   <meta name="description" content="A team's own EA Clubs match archive and statistics viewer.">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'">
   <title>DubsFC Tracker</title>
-  <link rel="stylesheet" href="assets/style.css?v=4">
-  <script src="assets/stats.js?v=4" defer></script>
-  <script src="assets/app.js?v=4" defer></script>
+  <link rel="stylesheet" href="assets/style.css?v=5">
+  <script src="assets/stats.js?v=5" defer></script>
+  <script src="assets/clubs.js?v=5" defer></script>
+  <script src="assets/app.js?v=5" defer></script>
 </head>
 <body>
 <div id="demo-banner" class="demo-banner" hidden>DEMO MODE · Entirely synthetic players and results. Not fetched from EA.</div>
@@ -18,9 +19,10 @@
 </header>
 <main>
 <section class="hero" id="overview">
-  <div><div class="eyebrow" id="edition">EA CLUBS / PERSONAL ARCHIVE</div><h1 id="club-name">Your club, recorded.</h1>
+  <div><div class="eyebrow" id="edition">EA CLUBS / PERSONAL ARCHIVE</div><h1 id="club-name" aria-live="polite">Your club, recorded.</h1>
+    <label class="club-picker" id="club-picker" hidden>Club<select id="club-select"></select></label>
   </div>
-  <div class="hero-actions"><a id="log-link" class="button secondary" hidden target="_blank" rel="noopener noreferrer">Collector log ↗</a><a class="button primary" href="data/player_matches.csv" id="export">Export all match CSV ↓</a></div>
+  <div class="hero-actions"><a id="log-link" class="button secondary" hidden target="_blank" rel="noopener noreferrer">Collector log ↗</a><a class="button primary" id="export" hidden>Export all match CSV ↓</a></div>
 </section>
 <section class="health" id="collector-health" aria-label="Collector status" hidden>
   <span id="status-pill" class="pill">Loading</span><p id="health-text" aria-live="polite">Loading your archive…</p><span id="freshness" class="muted"></span>

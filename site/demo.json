@@ -1,34 +1,27 @@
 {
   "archive_updated_at": null,
+  "club": {
+    "club_id": "000000",
+    "club_name": "Dubs VzeDoux · Demo",
+    "edition": "fc27",
+    "platform": "common-gen5"
+  },
   "collection": {
     "last_api_attempt_at": null,
     "message": "Synthetic demonstration only. No EA data or real collection status.",
-    "run_at": "2026-09-28T10:30:23+00:00",
+    "run_at": "2026-09-30T12:17:37+00:00",
     "status": "demo"
   },
-  "config": {
-    "advanced_mapping_confirmed": false,
-    "advanced_mapping_version": "",
-    "club_id": "000000",
-    "club_name": "Dubs VzeDoux · Demo",
-    "collection_enabled": false,
-    "edition": "fc27",
-    "match_types": [
-      "leagueMatch",
-      "playoffMatch"
-    ],
-    "platform": "common-gen5"
-  },
   "decoder": "community-selected-stats-v2-unofficial",
-  "generated_at": "2026-09-28T10:30:23+00:00",
+  "generated_at": "2026-09-30T12:17:37+00:00",
   "mapping_reviewed": false,
   "matches": [
     {
-      "first_archived_at": "2026-09-28T09:30:23+00:00",
+      "first_archived_at": "2026-09-30T11:17:37+00:00",
       "goals": 4,
       "goals_against": 1,
       "id": "900000",
-      "last_changed_at": "2026-09-28T09:30:23+00:00",
+      "last_changed_at": "2026-09-30T11:17:37+00:00",
       "match_types": [
         "playoffMatch"
       ],
@@ -227,14 +220,14 @@
       ],
       "result": "W",
       "result_source": "synthetic demonstration",
-      "timestamp": "2026-09-28T09:30:23+00:00"
+      "timestamp": "2026-09-30T11:17:37+00:00"
     },
     {
-      "first_archived_at": "2026-09-28T07:30:23+00:00",
+      "first_archived_at": "2026-09-30T09:17:37+00:00",
       "goals": 2,
       "goals_against": 0,
       "id": "900001",
-      "last_changed_at": "2026-09-28T07:30:23+00:00",
+      "last_changed_at": "2026-09-30T09:17:37+00:00",
       "match_types": [
         "leagueMatch"
       ],
@@ -433,14 +426,14 @@
       ],
       "result": "W",
       "result_source": "synthetic demonstration",
-      "timestamp": "2026-09-28T07:30:23+00:00"
+      "timestamp": "2026-09-30T09:17:37+00:00"
     },
     {
-      "first_archived_at": "2026-09-28T05:30:23+00:00",
+      "first_archived_at": "2026-09-30T07:17:37+00:00",
       "goals": 1,
       "goals_against": 2,
       "id": "900002",
-      "last_changed_at": "2026-09-28T05:30:23+00:00",
+      "last_changed_at": "2026-09-30T07:17:37+00:00",
       "match_types": [
         "leagueMatch"
       ],
@@ -639,14 +632,14 @@
       ],
       "result": "L",
       "result_source": "synthetic demonstration",
-      "timestamp": "2026-09-28T05:30:23+00:00"
+      "timestamp": "2026-09-30T07:17:37+00:00"
     },
     {
-      "first_archived_at": "2026-09-27T09:30:23+00:00",
+      "first_archived_at": "2026-09-29T11:17:37+00:00",
       "goals": 3,
       "goals_against": 3,
       "id": "900003",
-      "last_changed_at": "2026-09-27T09:30:23+00:00",
+      "last_changed_at": "2026-09-29T11:17:37+00:00",
       "match_types": [
         "leagueMatch"
       ],
@@ -845,14 +838,14 @@
       ],
       "result": "D",
       "result_source": "synthetic demonstration",
-      "timestamp": "2026-09-27T09:30:23+00:00"
+      "timestamp": "2026-09-29T11:17:37+00:00"
     },
     {
-      "first_archived_at": "2026-09-27T07:30:23+00:00",
+      "first_archived_at": "2026-09-29T09:17:37+00:00",
       "goals": 5,
       "goals_against": 2,
       "id": "900004",
-      "last_changed_at": "2026-09-27T07:30:23+00:00",
+      "last_changed_at": "2026-09-29T09:17:37+00:00",
       "match_types": [
         "friendlyMatch"
       ],
@@ -1051,14 +1044,14 @@
       ],
       "result": "W",
       "result_source": "synthetic demonstration",
-      "timestamp": "2026-09-27T07:30:23+00:00"
+      "timestamp": "2026-09-29T09:17:37+00:00"
     },
     {
-      "first_archived_at": "2026-09-27T05:30:23+00:00",
+      "first_archived_at": "2026-09-29T07:17:37+00:00",
       "goals": 2,
       "goals_against": 1,
       "id": "900005",
-      "last_changed_at": "2026-09-27T05:30:23+00:00",
+      "last_changed_at": "2026-09-29T07:17:37+00:00",
       "match_types": [
         "playoffMatch"
       ],
@@ -1257,14 +1250,14 @@
       ],
       "result": "W",
       "result_source": "synthetic demonstration",
-      "timestamp": "2026-09-27T05:30:23+00:00"
+      "timestamp": "2026-09-29T07:17:37+00:00"
     },
     {
-      "first_archived_at": "2026-09-26T09:30:23+00:00",
+      "first_archived_at": "2026-09-28T11:17:37+00:00",
       "goals": 1,
       "goals_against": 0,
       "id": "900006",
-      "last_changed_at": "2026-09-26T09:30:23+00:00",
+      "last_changed_at": "2026-09-28T11:17:37+00:00",
       "match_types": [
         "leagueMatch"
       ],
@@ -1463,14 +1456,14 @@
       ],
       "result": "W",
       "result_source": "synthetic demonstration",
-      "timestamp": "2026-09-26T09:30:23+00:00"
+      "timestamp": "2026-09-28T11:17:37+00:00"
     },
     {
-      "first_archived_at": "2026-09-26T07:30:23+00:00",
+      "first_archived_at": "2026-09-28T09:17:37+00:00",
       "goals": 4,
       "goals_against": 1,
       "id": "900007",
-      "last_changed_at": "2026-09-26T07:30:23+00:00",
+      "last_changed_at": "2026-09-28T09:17:37+00:00",
       "match_types": [
         "leagueMatch"
       ],
@@ -1669,14 +1662,14 @@
       ],
       "result": "W",
       "result_source": "synthetic demonstration",
-      "timestamp": "2026-09-26T07:30:23+00:00"
+      "timestamp": "2026-09-28T09:17:37+00:00"
     },
     {
-      "first_archived_at": "2026-09-26T05:30:23+00:00",
+      "first_archived_at": "2026-09-28T07:17:37+00:00",
       "goals": 2,
       "goals_against": 0,
       "id": "900008",
-      "last_changed_at": "2026-09-26T05:30:23+00:00",
+      "last_changed_at": "2026-09-28T07:17:37+00:00",
       "match_types": [
         "leagueMatch"
       ],
@@ -1875,14 +1868,14 @@
       ],
       "result": "W",
       "result_source": "synthetic demonstration",
-      "timestamp": "2026-09-26T05:30:23+00:00"
+      "timestamp": "2026-09-28T07:17:37+00:00"
     },
     {
-      "first_archived_at": "2026-09-25T09:30:23+00:00",
+      "first_archived_at": "2026-09-27T11:17:37+00:00",
       "goals": 1,
       "goals_against": 2,
       "id": "900009",
-      "last_changed_at": "2026-09-25T09:30:23+00:00",
+      "last_changed_at": "2026-09-27T11:17:37+00:00",
       "match_types": [
         "friendlyMatch"
       ],
@@ -2081,14 +2074,14 @@
       ],
       "result": "L",
       "result_source": "synthetic demonstration",
-      "timestamp": "2026-09-25T09:30:23+00:00"
+      "timestamp": "2026-09-27T11:17:37+00:00"
     },
     {
-      "first_archived_at": "2026-09-25T07:30:23+00:00",
+      "first_archived_at": "2026-09-27T09:17:37+00:00",
       "goals": 3,
       "goals_against": 3,
       "id": "900010",
-      "last_changed_at": "2026-09-25T07:30:23+00:00",
+      "last_changed_at": "2026-09-27T09:17:37+00:00",
       "match_types": [
         "playoffMatch"
       ],
@@ -2287,14 +2280,14 @@
       ],
       "result": "D",
       "result_source": "synthetic demonstration",
-      "timestamp": "2026-09-25T07:30:23+00:00"
+      "timestamp": "2026-09-27T09:17:37+00:00"
     },
     {
-      "first_archived_at": "2026-09-25T05:30:23+00:00",
+      "first_archived_at": "2026-09-27T07:17:37+00:00",
       "goals": 5,
       "goals_against": 2,
       "id": "900011",
-      "last_changed_at": "2026-09-25T05:30:23+00:00",
+      "last_changed_at": "2026-09-27T07:17:37+00:00",
       "match_types": [
         "leagueMatch"
       ],
@@ -2493,14 +2486,14 @@
       ],
       "result": "W",
       "result_source": "synthetic demonstration",
-      "timestamp": "2026-09-25T05:30:23+00:00"
+      "timestamp": "2026-09-27T07:17:37+00:00"
     },
     {
-      "first_archived_at": "2026-09-24T09:30:23+00:00",
+      "first_archived_at": "2026-09-26T11:17:37+00:00",
       "goals": 2,
       "goals_against": 1,
       "id": "900012",
-      "last_changed_at": "2026-09-24T09:30:23+00:00",
+      "last_changed_at": "2026-09-26T11:17:37+00:00",
       "match_types": [
         "leagueMatch"
       ],
@@ -2699,14 +2692,14 @@
       ],
       "result": "W",
       "result_source": "synthetic demonstration",
-      "timestamp": "2026-09-24T09:30:23+00:00"
+      "timestamp": "2026-09-26T11:17:37+00:00"
     },
     {
-      "first_archived_at": "2026-09-24T07:30:23+00:00",
+      "first_archived_at": "2026-09-26T09:17:37+00:00",
       "goals": 1,
       "goals_against": 0,
       "id": "900013",
-      "last_changed_at": "2026-09-24T07:30:23+00:00",
+      "last_changed_at": "2026-09-26T09:17:37+00:00",
       "match_types": [
         "leagueMatch"
       ],
@@ -2905,7 +2898,7 @@
       ],
       "result": "W",
       "result_source": "synthetic demonstration",
-      "timestamp": "2026-09-24T07:30:23+00:00"
+      "timestamp": "2026-09-26T09:17:37+00:00"
     }
   ],
   "persistent_state": {},

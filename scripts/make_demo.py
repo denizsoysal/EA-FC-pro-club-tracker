@@ -9,8 +9,8 @@ t = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(t)
 root = Path(__file__).resolve().parents[1]
 config = t.load_config(root)
-config.update(club_id='000000', club_name='Dubs VzeDoux · Demo',
-              advanced_mapping_confirmed=False, advanced_mapping_version='')
+# The demo is one synthetic club; it never reuses a real club's ID.
+club = {**t.club_identity(t.default_club(config)), 'club_id': '000000', 'club_name': 'Dubs VzeDoux · Demo'}
 now = datetime.now(timezone.utc)
 matches = []
 names = ['Creator 10', 'Finisher 9', 'Anchor 6', 'Runner 7', 'Keeper 1']
@@ -58,7 +58,7 @@ for i in range(14):
                     'result': 'W' if goals > conceded else 'D' if goals == conceded else 'L',
                     'result_source': 'synthetic demonstration', 'players': players,
                     'first_archived_at': when, 'last_changed_at': when})
-payload = {'schema_version': t.VIEWER_SCHEMA, 'config': config, 'decoder': t.DECODER,
+payload = {'schema_version': t.VIEWER_SCHEMA, 'club': club, 'decoder': t.DECODER,
            'mapping_reviewed': False, 'generated_at': t.stamp(now),
            'collection': {'status': 'demo', 'message': 'Synthetic demonstration only. No EA data or real collection status.',
                           'run_at': t.stamp(now), 'last_api_attempt_at': None},

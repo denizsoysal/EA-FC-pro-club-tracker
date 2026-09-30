@@ -1,3 +1,29 @@
+# v4 — several clubs in one tracker
+
+- `config.json` accepts a `clubs` list and `default_club_id`. The single-club
+  configuration still works; beside a `clubs` list the old top-level club fields
+  are ignored, so no club is collected twice. Duplicate or non-numeric IDs are rejected.
+- One `sync` (and one scheduled workflow run) collects every club, once per
+  match type, with a pause between all requests. A club's own failure no longer
+  ends the run for the other clubs; access denials and rate limits are
+  host-wide and stop it for every club. That state now lives in
+  `data/collector_state.json`; one left in a club folder is still honoured.
+- Each club keeps its own archive folder, inventory, revisions and journal.
+  Existing archives are not moved or rewritten. `verify` and `backup` report per club.
+- CI commits the verified club folders even when another club's archive is
+  damaged, then fails the run without touching the damaged folder.
+- The viewer has a club selector, `?club=<id>` links and a remembered choice,
+  and loads one dataset per club from `site/data/clubs/<id>/`. Generated paths
+  changed from `site/data/index.json` and `site/data/player_matches.csv`.
+- Exports name the club in the filename and in `club_id`/`club_name` columns.
+- The published dataset carries only the club's name, ID, platform and edition
+  label instead of the whole `config.json`.
+- Added multi-club collector, storage, persistence, selection and browser tests.
+
+No hosted GitHub run of this version was executed when it was written.
+
+---
+
 # v3 — DubsFC Tracker and protected history
 
 - Requested branding, boilerplate removal, simplified passing and no event-coverage UI.

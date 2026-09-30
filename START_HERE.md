@@ -42,6 +42,10 @@ That switch controls scheduled runs only. You do not need to change the mapping
 confirmation to make the advanced columns display. Event meanings remain
 community-reported unless independently checked against the game.
 
+To track more than one club, add a `clubs` list and `default_club_id` instead;
+see "Several clubs" in README.md. One `sync` then collects all of them and the
+website gets a club selector.
+
 ## GitHub
 
 The full `.github/workflows/archive-and-publish.yml`, `.gitattributes`, and

@@ -24,3 +24,34 @@ removing the inventory. Keep a backup on another drive.
 
 An empty project is different: run `sync` to collect available records. A backup
 of an empty history cannot restore records deleted before it was created.
+
+## Adding a club to an existing installation
+
+Back up and verify first, with the collector stopped:
+
+```powershell
+python scripts/tracker.py backup
+python scripts/tracker.py verify
+```
+
+Then add `clubs` and `default_club_id` to `config.json` (see README, "Several
+clubs"). Leave `match_types`, `collection_enabled` and the mapping settings as
+they are; the old top-level club fields may stay. The existing club keeps its
+folder, files and checksum baseline. The new club gets its own folder and
+baseline on its first `sync` or `backup`; until then `verify` reports that it
+has no baseline yet, which is expected for a club that has never been collected.
+
+```powershell
+python scripts/tracker.py sync
+python scripts/tracker.py verify
+python scripts/tracker.py backup
+```
+
+If this repository is collected by the GitHub workflow, do not commit a local
+`sync` of `data/`: pull the workflow's archive commits first and let the
+workflow collect the new club, so local and hosted archive commits cannot conflict.
+
+Generated viewer files moved to `site/data/clubs.json` and
+`site/data/clubs/<club_id>/`. `build` removes the old generated
+`site/data/index.json` and `site/data/player_matches.csv`; nothing in `data/`
+is removed.

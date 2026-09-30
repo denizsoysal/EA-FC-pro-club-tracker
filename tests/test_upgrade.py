@@ -39,7 +39,7 @@ class UpgradeTests(unittest.TestCase):
             self.assertEqual((root / 'config.json').read_bytes(), original_config)
             self.assertEqual({p: p.read_bytes() for p in folder.glob('*.json')}, original)
             self.assertEqual(json.loads(outputs['verify'])['archives'][0]['matches'], 10)
-            self.assertEqual(len(json.loads((root / 'site/data/index.json').read_bytes())['matches']), 10)
+            self.assertEqual(len(json.loads((root / 'site/data/clubs/100/index.json').read_bytes())['matches']), 10)
             backup = json.loads(outputs['backup'])['backup']
             with zipfile.ZipFile(backup) as z:
                 for path, body in original.items(): self.assertEqual(z.read(path.relative_to(root).as_posix()), body)

@@ -42,6 +42,27 @@ so it can be replayed using `import-json` after the original failure is resolved
 A journaled interrupted transaction is finished on the next command. Unexpected
 changes or unavailable staged bytes stop recovery instead of guessing.
 
+## Several clubs
+
+Each configured club is a separate archive: its own folder, inventory, journal,
+staging area, revisions, snapshots and captured responses. Steps 2 to 7 above
+run per club. Nothing is shared between club folders, so one club's write can
+neither collide with nor rewrite another's, and adding a club only creates a new
+folder. A match between two configured clubs is stored once in each folder under
+that club's identity; a later revision seen through one club's feed changes only
+that club's copy.
+
+A failure specific to one club (rejected feed, server error, failed integrity
+check) stops that club's remaining requests and is reported for it; matches
+already accepted for any club stay on disk, and the next club is still
+collected. HTTP 401/403 and 429 are treated as host-wide: the run stops, the
+state is kept in `data/collector_state.json`, and later runs request no club
+until a manual resume or the end of the cooldown.
+
+Verification reports every club even when one fails. The CI helper then commits
+and pushes only the verified club folders, leaves the damaged one exactly as it
+found it, and fails the run. It never deletes or regenerates an inventory.
+
 ## Checks and their limits
 
 Protected inventory: current matches, retained revisions, decoded response
