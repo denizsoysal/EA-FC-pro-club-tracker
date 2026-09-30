@@ -1,5 +1,86 @@
 {
-  "files": {},
+  "files": {
+    "matches/38330799890500.json": {
+      "bytes": 10687,
+      "sha256": "eb86b26f87949d2db169a298487a7c074cc37d60305711332b0cbbaaf30b461a"
+    },
+    "matches/38454450290169.json": {
+      "bytes": 14627,
+      "sha256": "6cdda65f9132cd55d6057f047af2406361abc01943ee1f7b53d61d716e3bae8a"
+    },
+    "matches/38454557110173.json": {
+      "bytes": 14479,
+      "sha256": "6da76bd8bc267add7e6a07fdc75ee7014532a3d9db9cd2d2714eaa14c0af64b7"
+    },
+    "matches/38458731690157.json": {
+      "bytes": 13051,
+      "sha256": "cf3321bef1af103070ee30aea8c8521f3668690dcc5a127b74f08fe0c5a34a3f"
+    },
+    "matches/38488727020122.json": {
+      "bytes": 13154,
+      "sha256": "42c866593d9a4c2c057977577021710003a37ea989ee828c9035fd1a1d974d54"
+    },
+    "matches/42796453340202.json": {
+      "bytes": 14382,
+      "sha256": "f7667c340fc761abf7c5b2d6b389d598f2e52015b2f756d4f439316098fa541b"
+    },
+    "matches/42818291080025.json": {
+      "bytes": 12970,
+      "sha256": "bdcc5e325ac8a14ecd1b6cc21a90d9bee4d9e8ceae03e72466b8e263bc0a8ab8"
+    },
+    "matches/42874519850385.json": {
+      "bytes": 11461,
+      "sha256": "88fcfca211ee7c8a21d00740aaa73179e648f60d807c79eb6e81fde37d3655e4"
+    },
+    "responses/leagueMatch/de3061bb78fb312ed248c805ecf2f5a3651138e7c61a24110ee2bd50ccc0abef.json": {
+      "bytes": 88461,
+      "sha256": "de3061bb78fb312ed248c805ecf2f5a3651138e7c61a24110ee2bd50ccc0abef"
+    },
+    "responses/playoffMatch/051b44ba46071835bb9b94f192df6b180ec35436bcad022d5304a4723f7463cf.json": {
+      "bytes": 105,
+      "sha256": "051b44ba46071835bb9b94f192df6b180ec35436bcad022d5304a4723f7463cf"
+    },
+    "revisions/38330799890500/eb86b26f87949d2db169a298487a7c074cc37d60305711332b0cbbaaf30b461a.json": {
+      "bytes": 10687,
+      "sha256": "eb86b26f87949d2db169a298487a7c074cc37d60305711332b0cbbaaf30b461a"
+    },
+    "revisions/38454450290169/6cdda65f9132cd55d6057f047af2406361abc01943ee1f7b53d61d716e3bae8a.json": {
+      "bytes": 14627,
+      "sha256": "6cdda65f9132cd55d6057f047af2406361abc01943ee1f7b53d61d716e3bae8a"
+    },
+    "revisions/38454557110173/6da76bd8bc267add7e6a07fdc75ee7014532a3d9db9cd2d2714eaa14c0af64b7.json": {
+      "bytes": 14479,
+      "sha256": "6da76bd8bc267add7e6a07fdc75ee7014532a3d9db9cd2d2714eaa14c0af64b7"
+    },
+    "revisions/38458731690157/cf3321bef1af103070ee30aea8c8521f3668690dcc5a127b74f08fe0c5a34a3f.json": {
+      "bytes": 13051,
+      "sha256": "cf3321bef1af103070ee30aea8c8521f3668690dcc5a127b74f08fe0c5a34a3f"
+    },
+    "revisions/38488727020122/42c866593d9a4c2c057977577021710003a37ea989ee828c9035fd1a1d974d54.json": {
+      "bytes": 13154,
+      "sha256": "42c866593d9a4c2c057977577021710003a37ea989ee828c9035fd1a1d974d54"
+    },
+    "revisions/42796453340202/f7667c340fc761abf7c5b2d6b389d598f2e52015b2f756d4f439316098fa541b.json": {
+      "bytes": 14382,
+      "sha256": "f7667c340fc761abf7c5b2d6b389d598f2e52015b2f756d4f439316098fa541b"
+    },
+    "revisions/42818291080025/bdcc5e325ac8a14ecd1b6cc21a90d9bee4d9e8ceae03e72466b8e263bc0a8ab8.json": {
+      "bytes": 12970,
+      "sha256": "bdcc5e325ac8a14ecd1b6cc21a90d9bee4d9e8ceae03e72466b8e263bc0a8ab8"
+    },
+    "revisions/42874519850385/88fcfca211ee7c8a21d00740aaa73179e648f60d807c79eb6e81fde37d3655e4.json": {
+      "bytes": 11461,
+      "sha256": "88fcfca211ee7c8a21d00740aaa73179e648f60d807c79eb6e81fde37d3655e4"
+    },
+    "snapshots/leagueMatch/78fb3a5c32f258df52e840f60246d1391c3e26d2d6dbe6ad8f2937538ceeb92a.json": {
+      "bytes": 102558,
+      "sha256": "78fb3a5c32f258df52e840f60246d1391c3e26d2d6dbe6ad8f2937538ceeb92a"
+    },
+    "snapshots/playoffMatch/37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570.json": {
+      "bytes": 3,
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+    }
+  },
   "identity": {
     "club_id": "976704",
     "edition": "fc27",
