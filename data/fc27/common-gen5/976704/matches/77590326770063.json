@@ -2,7 +2,7 @@
   "club_id": "976704",
   "edition": "fc27",
   "first_archived_at": "2026-10-07T22:17:15+00:00",
-  "last_changed_at": "2026-10-10T22:55:04+00:00",
+  "last_changed_at": "2026-10-11T19:31:03+00:00",
   "match_id": "77590326770063",
   "match_types": [
     "leagueMatch"
@@ -102,7 +102,7 @@
             "crestColor": "0",
             "customAwayKitId": "7632",
             "customKeeperKitId": "5000",
-            "customKitId": "7541",
+            "customKitId": "7600",
             "customThirdKitId": "7544",
             "dCustomKit": "0",
             "kitAColor1": "15921906",
@@ -111,7 +111,7 @@
             "kitAColor4": "9836336",
             "kitColor1": "592653",
             "kitColor2": "14356498",
-            "kitColor3": "15921906",
+            "kitColor3": "592653",
             "kitColor4": "15921906",
             "kitId": "14819328",
             "kitThrdColor1": "7122142",
