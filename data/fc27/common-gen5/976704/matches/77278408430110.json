@@ -2,7 +2,7 @@
   "club_id": "976704",
   "edition": "fc27",
   "first_archived_at": "2026-10-07T19:57:10+00:00",
-  "last_changed_at": "2026-10-12T19:46:42+00:00",
+  "last_changed_at": "2026-10-12T20:26:17+00:00",
   "match_id": "77278408430110",
   "match_types": [
     "leagueMatch"
@@ -104,7 +104,7 @@
             "customKeeperKitId": "5016",
             "customKitId": "7621",
             "customThirdKitId": "7629",
-            "dCustomKit": "3",
+            "dCustomKit": "0",
             "kitAColor1": "15921906",
             "kitAColor2": "11605302",
             "kitAColor3": "592653",
