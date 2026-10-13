@@ -2,7 +2,7 @@
   "club_id": "696276",
   "edition": "fc27",
   "first_archived_at": "2026-10-13T13:08:40+00:00",
-  "last_changed_at": "2026-10-13T13:08:40+00:00",
+  "last_changed_at": "2026-10-13T13:43:35+00:00",
   "match_id": "97218123890216",
   "match_types": [
     "leagueMatch"
@@ -168,7 +168,7 @@
             "seasonalKitId": "1076404224",
             "seasonalTeamId": "131397",
             "selectedKitType": "1",
-            "stadName": "BC Place"
+            "stadName": "Gillette Stadium"
           },
           "name": "Dubs VzeDoux",
           "regionId": 5457237,
@@ -359,7 +359,7 @@
       }
     },
     "timeAgo": {
-      "number": 7,
+      "number": 42,
       "unit": "minutes"
     },
     "timestamp": 1791896473
