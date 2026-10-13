@@ -2,7 +2,7 @@
   "club_id": "696276",
   "edition": "fc27",
   "first_archived_at": "2026-10-13T13:43:35+00:00",
-  "last_changed_at": "2026-10-13T17:47:08+00:00",
+  "last_changed_at": "2026-10-13T17:59:01+00:00",
   "match_id": "97278157980180",
   "match_types": [
     "leagueMatch"
@@ -168,7 +168,7 @@
             "seasonalKitId": "1076404224",
             "seasonalTeamId": "131397",
             "selectedKitType": "1",
-            "stadName": "Gillette Stadium"
+            "stadName": "Gillette Stadiu"
           },
           "name": "Dubs VzeDoux",
           "regionId": 5457237,
