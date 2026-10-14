@@ -2,7 +2,7 @@
   "club_id": "696276",
   "edition": "fc27",
   "first_archived_at": "2026-10-14T21:57:01+00:00",
-  "last_changed_at": "2026-10-14T21:57:01+00:00",
+  "last_changed_at": "2026-10-14T22:20:18+00:00",
   "match_id": "102264215490191",
   "match_types": [
     "leagueMatch"
@@ -102,20 +102,20 @@
             "crestColor": "0",
             "customAwayKitId": "7627",
             "customKeeperKitId": "5035",
-            "customKitId": "7623",
-            "customThirdKitId": "7648",
+            "customKitId": "7606",
+            "customThirdKitId": "7623",
             "dCustomKit": "0",
             "kitAColor1": "15921906",
             "kitAColor2": "592653",
             "kitAColor3": "592653",
             "kitAColor4": "592653",
-            "kitColor1": "592653",
+            "kitColor1": "1711155",
             "kitColor2": "8656677",
             "kitColor3": "15921906",
             "kitColor4": "15921906",
             "kitId": "598016",
-            "kitThrdColor1": "11605302",
-            "kitThrdColor2": "15921906",
+            "kitThrdColor1": "13914459",
+            "kitThrdColor2": "5775459",
             "kitThrdColor3": "15921906",
             "kitThrdColor4": "15921906",
             "seasonalKitId": "1076404224",
@@ -359,7 +359,7 @@
       }
     },
     "timeAgo": {
-      "number": 1,
+      "number": 24,
       "unit": "minutes"
     },
     "timestamp": 1792014948
