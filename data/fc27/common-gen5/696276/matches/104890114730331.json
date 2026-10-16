@@ -2,7 +2,7 @@
   "club_id": "696276",
   "edition": "fc27",
   "first_archived_at": "2026-10-15T17:45:12+00:00",
-  "last_changed_at": "2026-10-16T15:46:00+00:00",
+  "last_changed_at": "2026-10-16T15:56:54+00:00",
   "match_id": "104890114730331",
   "match_types": [
     "playoffMatch"
@@ -95,38 +95,7 @@
       "1617248": {
         "TEAM": "110",
         "date": "1792085639",
-        "details": {
-          "clubId": 1617248,
-          "customKit": {
-            "crestAssetId": "99160509",
-            "crestColor": "0",
-            "customAwayKitId": "7509",
-            "customKeeperKitId": "5005",
-            "customKitId": "7509",
-            "customThirdKitId": "7511",
-            "dCustomKit": "0",
-            "kitAColor1": "5775459",
-            "kitAColor2": "15921906",
-            "kitAColor3": "15921906",
-            "kitAColor4": "15921906",
-            "kitColor1": "15921906",
-            "kitColor2": "5775459",
-            "kitColor3": "5775459",
-            "kitColor4": "5775459",
-            "kitId": "901120",
-            "kitThrdColor1": "12706617",
-            "kitThrdColor2": "33627",
-            "kitThrdColor3": "396864",
-            "kitThrdColor4": "5775459",
-            "seasonalKitId": "0",
-            "seasonalTeamId": "0",
-            "selectedKitType": "0",
-            "stadName": "Tier 1 Stadium"
-          },
-          "name": "LastClub",
-          "regionId": 5457237,
-          "teamId": 110
-        },
+        "details": null,
         "gameNumber": "0",
         "goals": "2",
         "goalsAgainst": "3",
