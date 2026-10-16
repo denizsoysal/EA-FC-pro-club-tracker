@@ -2,7 +2,7 @@
   "club_id": "976704",
   "edition": "fc27",
   "first_archived_at": "2026-10-07T22:17:15+00:00",
-  "last_changed_at": "2026-10-16T15:34:00+00:00",
+  "last_changed_at": "2026-10-16T15:46:11+00:00",
   "match_id": "77776339020285",
   "match_types": [
     "leagueMatch"
@@ -160,7 +160,7 @@
             "kitColor2": "5775459",
             "kitColor3": "5775459",
             "kitColor4": "5775459",
-            "kitId": "2670592",
+            "kitId": "11223040",
             "kitThrdColor1": "12706617",
             "kitThrdColor2": "33627",
             "kitThrdColor3": "396864",
@@ -168,11 +168,11 @@
             "seasonalKitId": "1076404224",
             "seasonalTeamId": "131397",
             "selectedKitType": "0",
-            "stadName": "Stade niveau 1"
+            "stadName": "Stade de l'UD Almería"
           },
           "name": "FEN V12",
           "regionId": 5457237,
-          "teamId": 326
+          "teamId": 1370
         },
         "gameNumber": "0",
         "goals": "3",

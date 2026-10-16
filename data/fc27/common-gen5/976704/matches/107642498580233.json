@@ -2,7 +2,7 @@
   "club_id": "976704",
   "edition": "fc27",
   "first_archived_at": "2026-10-16T15:21:43+00:00",
-  "last_changed_at": "2026-10-16T15:34:08+00:00",
+  "last_changed_at": "2026-10-16T15:46:18+00:00",
   "match_id": "107642498580233",
   "match_types": [
     "playoffMatch"
@@ -168,7 +168,7 @@
             "seasonalKitId": "1076404224",
             "seasonalTeamId": "131397",
             "selectedKitType": "0",
-            "stadName": "Stade niveau 1"
+            "stadName": "Stade de l'UD Almería"
           },
           "name": "FEN V12",
           "regionId": 5457237,
@@ -359,7 +359,7 @@
       }
     },
     "timeAgo": {
-      "number": 21,
+      "number": 33,
       "unit": "minutes"
     },
     "timestamp": 1792163564
