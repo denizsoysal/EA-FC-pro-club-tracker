@@ -2,7 +2,7 @@
   "club_id": "976704",
   "edition": "fc27",
   "first_archived_at": "2026-10-16T15:21:43+00:00",
-  "last_changed_at": "2026-10-16T15:21:43+00:00",
+  "last_changed_at": "2026-10-16T15:34:08+00:00",
   "match_id": "107642498580233",
   "match_types": [
     "playoffMatch"
@@ -160,19 +160,19 @@
             "kitColor2": "5775459",
             "kitColor3": "5775459",
             "kitColor4": "5775459",
-            "kitId": "2670592",
+            "kitId": "11223040",
             "kitThrdColor1": "12706617",
             "kitThrdColor2": "33627",
             "kitThrdColor3": "396864",
             "kitThrdColor4": "5775459",
-            "seasonalKitId": "0",
-            "seasonalTeamId": "0",
+            "seasonalKitId": "1076404224",
+            "seasonalTeamId": "131397",
             "selectedKitType": "0",
             "stadName": "Stade niveau 1"
           },
           "name": "FEN V12",
           "regionId": 5457237,
-          "teamId": 326
+          "teamId": 1370
         },
         "gameNumber": "0",
         "goals": "5",
@@ -359,7 +359,7 @@
       }
     },
     "timeAgo": {
-      "number": 8,
+      "number": 21,
       "unit": "minutes"
     },
     "timestamp": 1792163564

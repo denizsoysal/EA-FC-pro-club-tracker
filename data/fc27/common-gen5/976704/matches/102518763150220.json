@@ -2,7 +2,7 @@
   "club_id": "976704",
   "edition": "fc27",
   "first_archived_at": "2026-10-15T01:12:41+00:00",
-  "last_changed_at": "2026-10-16T01:11:45+00:00",
+  "last_changed_at": "2026-10-16T15:34:00+00:00",
   "match_id": "102518763150220",
   "match_types": [
     "leagueMatch"
@@ -118,8 +118,8 @@
             "kitThrdColor2": "33627",
             "kitThrdColor3": "396864",
             "kitThrdColor4": "5775459",
-            "seasonalKitId": "0",
-            "seasonalTeamId": "0",
+            "seasonalKitId": "1076404224",
+            "seasonalTeamId": "131397",
             "selectedKitType": "0",
             "stadName": "Stade niveau 1"
           },
