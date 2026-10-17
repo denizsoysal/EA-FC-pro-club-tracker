@@ -2,7 +2,7 @@
   "club_id": "696276",
   "edition": "fc27",
   "first_archived_at": "2026-10-15T19:19:32+00:00",
-  "last_changed_at": "2026-10-16T23:19:53+00:00",
+  "last_changed_at": "2026-10-17T09:44:28+00:00",
   "match_id": "105052571930210",
   "match_types": [
     "playoffMatch"
@@ -158,7 +158,7 @@
             "kitAColor4": "15245824",
             "kitColor1": "14356498",
             "kitColor2": "592653",
-            "kitColor3": "15921906",
+            "kitColor3": "15245824",
             "kitColor4": "15921906",
             "kitId": "11223040",
             "kitThrdColor1": "592653",
