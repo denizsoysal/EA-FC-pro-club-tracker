@@ -2,7 +2,7 @@
   "club_id": "696276",
   "edition": "fc27",
   "first_archived_at": "2026-10-16T19:31:56+00:00",
-  "last_changed_at": "2026-10-17T00:52:31+00:00",
+  "last_changed_at": "2026-10-17T01:36:59+00:00",
   "match_id": "108546501720157",
   "match_types": [
     "playoffMatch"
@@ -523,7 +523,7 @@
       }
     },
     "timeAgo": {
-      "number": 5,
+      "number": 6,
       "unit": "hours"
     },
     "timestamp": 1792178654
