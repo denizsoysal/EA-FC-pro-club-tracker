@@ -2,7 +2,7 @@
   "club_id": "696276",
   "edition": "fc27",
   "first_archived_at": "2026-10-15T18:51:18+00:00",
-  "last_changed_at": "2026-10-16T23:19:53+00:00",
+  "last_changed_at": "2026-10-17T03:46:16+00:00",
   "match_id": "104866732950117",
   "match_types": [
     "playoffMatch"
@@ -121,7 +121,7 @@
             "seasonalKitId": "0",
             "seasonalTeamId": "0",
             "selectedKitType": "0",
-            "stadName": "Stade niveau 1"
+            "stadName": "Home Deluxe Are"
           },
           "name": "PIPA ROYAL",
           "regionId": 5457237,
