@@ -2,7 +2,7 @@
   "club_id": "696276",
   "edition": "fc27",
   "first_archived_at": "2026-10-14T20:56:41+00:00",
-  "last_changed_at": "2026-10-17T20:56:51+00:00",
+  "last_changed_at": "2026-10-18T18:44:35+00:00",
   "match_id": "102100022510114",
   "match_types": [
     "leagueMatch"
@@ -160,7 +160,7 @@
             "kitColor2": "16696614",
             "kitColor3": "15245824",
             "kitColor4": "16696614",
-            "kitId": "913096704",
+            "kitId": "532480",
             "kitThrdColor1": "12706617",
             "kitThrdColor2": "33627",
             "kitThrdColor3": "396864",
@@ -172,7 +172,7 @@
           },
           "name": "BAMAKO UNITED",
           "regionId": 5457237,
-          "teamId": 111462
+          "teamId": 65
         },
         "gameNumber": "0",
         "goals": "4",
