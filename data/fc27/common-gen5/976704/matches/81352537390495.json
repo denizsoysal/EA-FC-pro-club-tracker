@@ -2,7 +2,7 @@
   "club_id": "976704",
   "edition": "fc27",
   "first_archived_at": "2026-10-08T23:56:51+00:00",
-  "last_changed_at": "2026-10-18T18:57:16+00:00",
+  "last_changed_at": "2026-10-18T19:17:25+00:00",
   "match_id": "81352537390495",
   "match_types": [
     "leagueMatch"
@@ -98,8 +98,8 @@
         "details": {
           "clubId": 647770,
           "customKit": {
-            "crestAssetId": "99160221",
-            "crestColor": "0",
+            "crestAssetId": "99040209",
+            "crestColor": "16777215",
             "customAwayKitId": "7531",
             "customKeeperKitId": "5011",
             "customKitId": "7669",
