@@ -2,7 +2,7 @@
   "club_id": "976704",
   "edition": "fc27",
   "first_archived_at": "2026-10-08T23:56:51+00:00",
-  "last_changed_at": "2026-10-18T19:17:25+00:00",
+  "last_changed_at": "2026-10-18T20:57:14+00:00",
   "match_id": "81352537390495",
   "match_types": [
     "leagueMatch"
@@ -120,7 +120,7 @@
             "kitThrdColor4": "15921906",
             "seasonalKitId": "1076404224",
             "seasonalTeamId": "131397",
-            "selectedKitType": "1",
+            "selectedKitType": "0",
             "stadName": "Gtech Community"
           },
           "name": "rcs blueco",
