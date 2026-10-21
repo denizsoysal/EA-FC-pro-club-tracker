@@ -404,6 +404,10 @@
       "bytes": 111573,
       "sha256": "1f8f3d21179ca0f6735dd7502b53774cb87f5433bcd6696eb483e59b5e94bd07"
     },
+    "responses/leagueMatch/1fa618cb198886c65fe08a3691c1639ce44ca07025b2c82535d273e8fbd19561.json": {
+      "bytes": 638,
+      "sha256": "1fa618cb198886c65fe08a3691c1639ce44ca07025b2c82535d273e8fbd19561"
+    },
     "responses/leagueMatch/20a96fb736b1750536d8b1377a70759c4e6f2cf20a74e874f3ce14fa3f220b94.json": {
       "bytes": 118241,
       "sha256": "20a96fb736b1750536d8b1377a70759c4e6f2cf20a74e874f3ce14fa3f220b94"
