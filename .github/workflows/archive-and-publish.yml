@@ -1,15 +1,11 @@
 name: Archive matches and publish viewer
 
+# EA has refused GitHub's runners (HTTP 403) since 2026-10-21, so this workflow
+# never contacts EA. A Raspberry Pi at home collects (deploy/raspberry-pi/) and
+# pushes data/; each push rebuilds and publishes the viewer here.
 on:
-  schedule:
-    # Best effort, not a guaranteed timer. Preserve a custom cron when upgrading.
-    - cron: '7,22,37,52 * * * *'
   workflow_dispatch:
     inputs:
-      resume:
-        description: 'Resume after a resolved 401/403? Does NOT bypass rate-limit cooldowns.'
-        type: boolean
-        default: false
       backup:
         description: 'Also upload a full recovery ZIP (14-day artifact retention)?'
         type: boolean
@@ -88,24 +84,11 @@ jobs:
           node --check site/assets/clubs.js
           node --test tests/test_stats.cjs tests/test_clubs.cjs
 
-      - name: Fetch and build
+      # Builds the viewer from the archive only; no request is sent to EA.
+      - name: Build viewer from the archive
         id: fetch
         if: steps.plan.outputs.active == 'true'
-        env:
-          EVENT_NAME: ${{ github.event_name }}
-          RESUME: ${{ inputs.resume }}
-        shell: bash
-        run: |
-          args=(--event push --defer-failure)
-          if [[ "$EVENT_NAME" == "schedule" ]]; then
-            args=(--event schedule --defer-failure)
-          elif [[ "$EVENT_NAME" == "workflow_dispatch" ]]; then
-            args=(--event manual --defer-failure)
-          fi
-          if [[ "$EVENT_NAME" == "workflow_dispatch" && "$RESUME" == "true" ]]; then
-            args+=(--resume)
-          fi
-          python scripts/tracker.py sync "${args[@]}"
+        run: python scripts/tracker.py sync --event push --defer-failure
 
       # This must run even if sync's viewer build or CSV export failed.
       - name: Preserve and push raw history BEFORE Pages deployment

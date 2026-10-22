@@ -120,16 +120,20 @@ failures, access-denial pauses, and possible missed-match warnings still display
 
 | View | Columns, in addition to player and appearances |
 | --- | --- |
-| Overview | Goals, assists, second assists, successful dribbles, tackles won, average rating |
-| Shooting | Goals, shots, shots on target |
-| Passing | Assists, passes made, pass %, successful through balls |
+| Overview | Goals, assists, key passes, opponents beaten, tackles + interceptions, average rating |
+| Shooting | Goals, shots, success rate (goals ÷ shots) |
+| Passing | Assists, passes made, pass %, key passes |
 | Dribbling | Successful dribbles, non-skill opponents beaten, skill-move beats |
 | Defending | Interceptions, tackles won, standing won, sliding won, ball recovered (dispossessions) |
 
 Forward/long-pass percentages and event-coverage columns are omitted from the
 visible views and their exports. All those original API fields are still kept
 in raw storage. Undefined statistics remain unavailable rather than false zeros.
-The per-match switch is per available appearance; percentages use paired totals.
+The per-match switch is on by default and is per available appearance;
+percentages use paired totals and do not change with it. Second assists and
+shots on target are no longer shown or exported; raw storage still keeps them.
+"Key passes" is community event 152, which decoders report as successful
+through balls; it is labelled key passes here, not a separately measured statistic.
 
 “Successful dribbles” means the **reported completed-dribble counter (174)**,
 not total attempts and not a verified count of one-on-one take-ons. “Ball recovered
@@ -239,14 +243,22 @@ hashes against working-tree bytes** before allowing an archive commit.
 
 See [the storage audit](docs/HISTORY_SAFETY.md) and [executed tests](TEST_REPORT.md).
 
+## Collection on a Raspberry Pi, publishing on GitHub
+
+Since 21 October 2026 EA answers GitHub's servers with HTTP 403 Access Denied,
+while it still answers a home connection. Collection therefore runs on a
+Raspberry Pi at home, twice an hour; see
+[deploy/raspberry-pi/README.md](deploy/raspberry-pi/README.md). The Pi commits
+and pushes only `data/`. GitHub never contacts EA: every push (and a manual run)
+tests, builds every club's viewer data and publishes Pages. `collection_enabled`
+now switches the Pi's scheduled collection on and off.
+
 ## GitHub automation
 
 Push the complete project, including hidden `.github/` and `.gitattributes` files, your
 configuration, and **all of `data/`**. Enable Pages with source **GitHub Actions**.
-Run the workflow manually first. After a hosted request works, enable
-`collection_enabled` in your config and commit that change.
 
-The workflow collects every configured club in one run, makes a recovery ZIP,
+The workflow builds every configured club from the archive, makes a recovery ZIP,
 verifies, commits **only `data/`**, and performs a normal Git push **before**
 Pages deployment. Persistence runs even when the preceding viewer build fails.
 Concurrent non-conflicting edits can be rebased; archive conflicts are aborted,
@@ -261,10 +273,10 @@ upload a recovery ZIP even when the run succeeds. Normal successful polls do
 not consume one permanent artifact per run. These artifacts are not an independent
 permanent backup and can fail to upload or expire.
 
-The timer is `7,22,37,52 * * * *` (UTC by default). Schedules are best effort;
-GitHub may delay/drop runs and disable inactive schedules. A running workflow is
-not a promise of complete coverage. A local successful fetch does not establish
-that EA accepts a hosted runner. 401/403 pause collection; 429 preserves a cooldown.
+The workflow has no schedule. To try collecting from GitHub again, restore the
+`schedule` trigger and the collecting `sync` step from Git history; a successful
+fetch from home does not mean EA accepts GitHub's runners. 401/403 pause
+collection for every club and 429 sets a cooldown, wherever the collector runs.
 
 ## What cannot be guaranteed
 

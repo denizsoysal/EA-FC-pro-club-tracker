@@ -6,15 +6,16 @@ Decoder identifier: `community-selected-stats-v2-unofficial`.
 
 | View | Statistics |
 | --- | --- |
-| Overview | Goals, assists, second assists, successful dribbles, tackles won, average rating |
-| Shooting | Goals, shots, shots on target |
-| Passing | Assists, passes made, pass completion, successful through balls |
+| Overview | Goals, assists, key passes, opponents beaten, tackles + interceptions, average rating |
+| Shooting | Goals, shots, success rate (100 × goals ÷ shots, over matches with both) |
+| Passing | Assists, passes made, pass completion, key passes |
 | Dribbling | Successful dribbles (reported completions), non-skill dribble beats, skill-move beats |
 | Defending | Interceptions, tackles won, standing/sliding tackles won, ball recovered (dispossessions) |
 
 Crossing, corner and header statistics are not displayed or exported as columns.
-Raw match objects remain intact, including unrecognized counters. Key passes and
-opponents bypassed by a pass are not inferred or shown.
+Raw match objects remain intact, including unrecognized counters. Opponents
+bypassed by a pass are not inferred or shown. Second assists (115) and shots on
+target (217) are decoded but no longer displayed or exported.
 
 ## Mapping reference (unofficial)
 
@@ -30,19 +31,22 @@ for Dubs VzeDoux, FC 27, or every match type**.
 | `shots_on_target` | Event 217 |
 | `forward_passes_completed`, `forward_passes_failed` | Events 30, 31 |
 | `long_passes_completed`, `long_passes_failed` | Events 28, 29 |
-| `through_balls_completed` | Event 152 |
+| `key_passes` | Event 152 (reported by the source as successful through balls) |
 | `dribbles_completed` | Event 174 |
 | `dribble_beats` | Event 112 minus event 38 |
 | `skill_move_beats` | Event 38 |
 | `interceptions` | Event 6 |
 | `standing_tackles_won`, `sliding_tackles_won` | Events 229, 230 |
 | `tackles_won` | Sum of the two won-tackle components |
+| `tackles_and_interceptions` | `tackles_won` + `interceptions`, per match |
 | `opponents_dispossessed` | Event 158 |
 
 Primary community source:
 https://www.reddit.com/r/fifaclubs/comments/1ws2mv0/pro_clubs_api_decoding_match_event_aggregate/
 
-Second assists are not labelled key passes. The source distinguishes non-skill
+The viewer's "key passes" is event 152, relabelled at the club's request; the
+source describes it as successful through balls, and second assists (115) are
+not used for it. The source distinguishes non-skill
 beats (`112 − 38`) from skill beats (`38`); the viewer keeps them separate.
 “Opponents beaten” is an action count, **not a count of distinct defenders**.
 Completed dribbles must not be interpreted as successful one-on-one take-ons.

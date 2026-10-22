@@ -10,9 +10,10 @@ const m = (players, extra = {}) => ({id: '10', timestamp: '2026-09-28T10:00:00Z'
   match_types: ['leagueMatch'], players, ...extra});
 const total = (players, opts) => S.playerTotals(players.map(player => m([player])), opts)[0];
 
-test('five views and no crosses or invented key-pass metric', () => {
+test('five views, no crosses, no second assists and no explanatory notes', () => {
   assert.deepEqual(Object.keys(S.VIEWS), ['overview', 'shooting', 'passing', 'dribbling', 'defending']);
-  assert(!Object.keys(S.METRICS).some(key => /cross|key_pass|beaten_by_pass/.test(key)));
+  assert(!Object.keys(S.METRICS).some(key => /cross|second_assist|through_ball|beaten_by_pass|on_target/.test(key)));
+  for (const view of Object.values(S.VIEWS)) assert(!('note' in view));
 });
 test('goals and assists are summed; rating is always averaged', () => {
   const a = total([p(), p({goals: 4, assists: 2, rating: 6})]);
@@ -20,15 +21,15 @@ test('goals and assists are summed; rating is always averaged', () => {
 });
 test('missing metrics stay null, not zero', () => {
   const a = total([p(), p()]);
-  assert.equal(a.second_assists, null); assert.equal(a.interceptions, null);
+  assert.equal(a.key_passes, null); assert.equal(a.interceptions, null);
 });
 test('a genuine zero counts as an available appearance', () => {
-  const a = total([p({second_assists: 0}), p({second_assists: null})]);
-  assert.equal(a.second_assists, 0); assert.equal(a.counts.second_assists, 1);
+  const a = total([p({key_passes: 0}), p({key_passes: null})]);
+  assert.equal(a.key_passes, 0); assert.equal(a.counts.key_passes, 1);
 });
 test('per-match denominator is available appearances, not all appearances', () => {
-  const a = total([p({second_assists: 4}), p({second_assists: null}), p({second_assists: 2})], {perMatch: true});
-  assert.equal(a.second_assists, 3); assert.equal(a.appearances, 3); assert.equal(a.counts.second_assists, 2);
+  const a = total([p({key_passes: 4}), p({key_passes: null}), p({key_passes: 2})], {perMatch: true});
+  assert.equal(a.key_passes, 3); assert.equal(a.appearances, 3); assert.equal(a.counts.key_passes, 2);
 });
 test('ordinary pass percentage is weighted, not a mean of percentages', () => {
   const a = total([p({passes_made: 1, pass_attempts: 1}), p({passes_made: 0, pass_attempts: 9})]);
@@ -98,24 +99,49 @@ test('CSV escapes formula prefixes, quotes, commas and line breaks', () => {
   assert.equal(S.csvCell(null), '');
 });
 test('view export respects selected keys, missing values and available-match counts', () => {
-  const rows = S.playerTotals([m([p({second_assists: 0, name: '=unsafe'})])]);
+  const rows = S.playerTotals([m([p({key_passes: 0, name: '=unsafe'})])]);
   const csv = S.tableCsv(rows, 'overview');
   assert(csv.startsWith('\ufeff')); assert(csv.includes("'=unsafe"));
-  assert(csv.includes('second_assists_available_matches'));
-  assert(!csv.includes('interceptions')); assert(!csv.includes('cross'));
+  assert(csv.includes('key_passes_available_matches'));
+  assert(!csv.includes('standing_tackles_won')); assert(!csv.includes('second_assists')); assert(!csv.includes('cross'));
   assert(csv.includes(',0,1,'));
 });
 test('demo has every displayed normalized key and labels itself synthetic', () => {
   const data = JSON.parse(fs.readFileSync(path.join(__dirname, '../site/demo.json'), 'utf8'));
   assert.equal(data.schema_version, 2); assert.equal(data.collection.status, 'demo');
   for (const match of data.matches) for (const player of match.players) {
-    for (const key of Object.keys(S.METRICS)) assert(key in player, `Missing normalized key: ${key}`);
+    // Rates the viewer derives itself (success rate) need their two counts instead.
+    for (const key of Object.keys(S.METRICS)) {
+      for (const field of S.RATES[key] && !(key in player) ? S.RATES[key] : [key]) {
+        assert(field in player, `Missing normalized key: ${field}`);
+      }
+    }
   }
 });
 
 
-test('passing view contains completed passes, pass percentage, through balls and assists', () => {
-  assert.deepEqual(S.VIEWS.passing.keys, ['assists', 'passes_made', 'pass_rate', 'through_balls_completed']);
+test('each view shows exactly the requested columns', () => {
+  assert.deepEqual(S.VIEWS.overview.keys, ['goals', 'assists', 'key_passes', 'dribble_beats', 'tackles_and_interceptions', 'rating']);
+  assert.deepEqual(S.VIEWS.shooting.keys, ['goals', 'shots', 'shot_success_rate']);
+  assert.deepEqual(S.VIEWS.passing.keys, ['assists', 'passes_made', 'pass_rate', 'key_passes']);
+  assert.deepEqual(S.VIEWS.dribbling.keys, ['dribbles_completed', 'dribble_beats', 'skill_move_beats']);
+  assert.deepEqual(S.VIEWS.defending.keys, ['interceptions', 'tackles_won', 'standing_tackles_won', 'sliding_tackles_won', 'opponents_dispossessed']);
+  assert.equal(S.METRICS.key_passes.label, 'Key passes');
+  assert.equal(S.METRICS.shot_success_rate.label, 'Success rate');
+  assert.equal(S.METRICS.tackles_and_interceptions.label, 'Tackles + interceptions');
+});
+test('success rate is total goals over total shots, unchanged by the per-match toggle', () => {
+  const players = [p({goals: 3, shots: 4}), p({goals: 0, shots: 6}), p({goals: 2, shots: null})];
+  assert.equal(total(players).shot_success_rate, 30);
+  assert.equal(total(players, {perMatch: true}).shot_success_rate, 30);
+  assert.equal(total(players).counts.shot_success_rate, 2);
+  assert.equal(total([p({goals: 0, shots: 0})]).shot_success_rate, null);
+  assert.equal(S.singleValue(p({goals: 1, shots: 4}), 'shot_success_rate'), 25);
+});
+test('tackles + interceptions totals and averages like any count', () => {
+  const players = [p({tackles_and_interceptions: 7}), p({tackles_and_interceptions: null}), p({tackles_and_interceptions: 3})];
+  assert.equal(total(players).tackles_and_interceptions, 10);
+  assert.equal(total(players, {perMatch: true}).tackles_and_interceptions, 5);
 });
 test('view exports have no event coverage, forward pass or long pass column', () => {
   for (const view of Object.keys(S.VIEWS)) {

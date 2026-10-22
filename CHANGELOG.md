@@ -1,3 +1,18 @@
+# v4.1 — collection moves to a Raspberry Pi
+
+- EA's CDN has answered GitHub's runners with HTTP 403 since 21 October 2026.
+  The workflow no longer has a schedule and never contacts EA; it builds and
+  publishes on every push and on manual runs.
+- Added `deploy/raspberry-pi/`: `collect.sh` (collect, commit and push `data/`),
+  `install.sh` (systemd timer at :07 and :37, catches up after downtime) and setup steps.
+- `persist_archive.py` accepts `--git-name`, `--git-email` and `--keep-recovery N`
+  (prune older recovery ZIPs, only after a successful push). Defaults are unchanged.
+- Added end-to-end tests of `collect.sh` with mocked EA replies and a local Git remote.
+
+Not run on a Raspberry Pi or under systemd when written.
+
+---
+
 # v4 — several clubs in one tracker
 
 - `config.json` accepts a `clubs` list and `default_club_id`. The single-club

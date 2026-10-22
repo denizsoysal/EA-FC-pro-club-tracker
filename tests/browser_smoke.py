@@ -51,6 +51,20 @@ CAPTURE_DOWNLOAD = '''() => {
 }'''
 
 
+class S:
+    @staticmethod
+    def playerTotals_py(matches):
+        """Goals / shots per player over every match with both counts, as the viewer shows it."""
+        sums = {}
+        for match in matches:
+            for player in match['players']:
+                goals, shots = player.get('goals'), player.get('shots')
+                if isinstance(goals, int) and isinstance(shots, int) and goals <= shots:
+                    made, tried = sums.get(player['name'], (0, 0))
+                    sums[player['name']] = (made + goals, tried + shots)
+        return {name: (f'{100 * made / tried:.1f}%' if tried else '—') for name, (made, tried) in sums.items()}
+
+
 def single(payload):
     """A one-club published site for a ready-made dataset."""
     club = payload.get('club') or payload['config']
@@ -111,6 +125,13 @@ def main():
             page.wait_for_function(settle)
             return page
 
+        def totals(page):
+            """Switch the table from its per-match default to totals."""
+            page.locator('#per-match').uncheck()
+
+        def headers(page):
+            return [cell.strip() for cell in page.locator('#player-head th').all_text_contents()]
+
         def text(page, selector):
             return page.locator(selector).inner_text()
 
@@ -152,31 +173,58 @@ def main():
         check('Event coverage' not in page.locator('body').inner_text(), 'no event coverage in viewer')
         check('Know what the numbers mean' not in page.locator('body').inner_text(), 'explanatory block removed')
         check('Every match you save' not in page.locator('body').inner_text(), 'hero slogan removed')
-        overview_head = page.locator('#player-head').text_content()
-        check('Successful dribbles' in overview_head and 'Tackles won' in overview_head, 'overview includes successful dribbles and tackles won')
-        check('Shots' not in overview_head and 'On target' not in overview_head, 'overview omits shooting columns')
+        check(headers(page) == ['Player', 'MP', 'Goals ↓', 'Assists', 'Key passes', 'Opponents beaten', 'Tackles + interceptions', 'Avg. rating'],
+              'overview shows MP, goals, assists, key passes, opponents beaten, tackles + interceptions and rating')
+        check(page.locator('#per-match').is_checked() and 'per available match' in text(page, '#view-count'), 'per match is selected by default')
+        first = page.locator('#player-body tr').first
+        check(re.fullmatch(r'\d+\.\d\d', first.locator('[data-stat="goals"]').inner_text().replace(',', '.')) is not None, 'default figures are per-match averages')
+        body = page.locator('body').inner_text()
+        removed = ['Second assists are the pass', 'shots on target is a community-mapped event', 'Completion percentages are weighted',
+                   'Successful dribbles = reported completions', 'Tackles won = standing + sliding', 'Statistics cover the archive',
+                   'Built for your club', 'No paid tracker required', 'not affiliated with EA', 'View synthetic demo',
+                   'Hover a heading', 'Actual match counts', '2nd assists', 'Through balls', 'On target']
+        check(not [term for term in removed if term in body] and page.locator('#view-note, .filter-note, .table-footnote, footer a').count() == 0,
+              'explanatory notes, footer text, demo link, second assists and old labels are gone')
 
         if args.screenshots:
             args.screenshots.mkdir(parents=True, exist_ok=True)
             page.screenshot(path=str(args.screenshots / 'overview-desktop.png'), full_page=True)
 
-        for view, expected in [('Shooting', 'On target'), ('Passing', 'Through balls'), ('Dribbling', 'Skill-move beats'), ('Defending', 'Ball recovered (dispossessions)')]:
+        expected_columns = {
+            'Shooting': ['Player', 'MP', 'Goals ↓', 'Shots', 'Success rate'],
+            'Passing': ['Player', 'MP', 'Assists', 'Passes made', 'Pass %', 'Key passes ↓'],
+            'Dribbling': ['Player', 'MP', 'Successful dribbles', 'Opponents beaten ↓', 'Skill-move beats'],
+            'Defending': ['Player', 'MP', 'Interceptions', 'Tackles won ↓', 'Standing won', 'Sliding won', 'Ball recovered (dispossessions)'],
+        }
+        for view, columns in expected_columns.items():
             tab = page.get_by_role('tab', name=view, exact=True); tab.click()
-            check(tab.get_attribute('aria-selected') == 'true' and expected in page.locator('#player-head').text_content(), f'{view} tab changes columns and active state')
+            check(tab.get_attribute('aria-selected') == 'true' and headers(page) == columns and page.locator('#per-match').is_checked(),
+                  f'{view} tab shows its columns and keeps the per-match default')
             if args.screenshots:
                 page.screenshot(path=str(args.screenshots / (view.lower() + '-desktop.png')), full_page=True)
                 page.locator('#players').screenshot(path=str(args.screenshots / (view.lower() + '-table.png')))
         check(not re.search(r'cross', page.locator('#player-head').text_content(), re.I), 'no crossing column')
+        page.get_by_role('tab', name='Shooting', exact=True).click()
+        rates = page.locator('[data-stat="shot_success_rate"]').all_inner_texts()
+        check(rates and all(value == '—' or value.endswith('%') for value in rates), 'success rate is shown as a percentage')
+        demo_totals = S.playerTotals_py(demo['matches'])
+        check({name: value.replace(',', '.') for name, (value, _) in table(page, 'shot_success_rate').items()} == demo_totals,
+              'success rate is total goals divided by total shots')
+        totals(page)
+        check(page.locator('[data-stat="shot_success_rate"]').all_inner_texts() == rates, 'per-match toggle does not change the success rate')
+        page.locator('#per-match').check()
         page.get_by_role('tab', name='Passing', exact=True).click()
         before = page.locator('[data-stat="pass_rate"]').all_inner_texts()
-        page.locator('#per-match').check()
+        totals(page)
         check(page.locator('[data-stat="pass_rate"]').all_inner_texts() == before, 'per-match toggle does not change percentages')
+        page.locator('#per-match').check()
         check('Forward %' not in page.locator('#player-head').inner_text() and 'Long %' not in page.locator('#player-head').inner_text(), 'unrequested pass columns removed')
         page.locator('#player-search').fill('creator')
         check(page.locator('#player-body tr').count() == 1 and 'Creator 10' in page.locator('#player-body').inner_text(), 'player search filters visible rows')
         # Mock only the DOM download click, capture the actual Blob generated.
         exported, _ = export_view(page)
-        check('Creator 10' in exported and 'Runner 7' not in exported and 'through_balls_completed' in exported, 'view CSV respects player search and selected category')
+        check('Creator 10' in exported and 'Runner 7' not in exported and 'key_passes' in exported and 'through_balls' not in exported
+              and 'per_available_match' in exported, 'view CSV respects player search, selected category and per-match default')
         page.locator('#player-search').fill('')
         page.locator('#per-match').uncheck()
         page.locator('#competition').select_option('friendlyMatch')
@@ -191,7 +239,10 @@ def main():
         page.wait_for_selector('.match-group')
         check(page.locator('.match-item').first.locator('.match-group').count() == 5, 'expanded match provides all five statistic groups')
         page.locator('.match-item').first.locator('[data-group="passing"] > summary').click()
-        check('Forward %' not in page.locator('.match-item').first.locator('[data-group="passing"]').text_content(), 'match detail omits forward and long columns')
+        detail = page.locator('.match-item').first
+        check('Forward %' not in detail.locator('[data-group="passing"]').text_content(), 'match detail omits forward and long columns')
+        check('Key passes' in detail.locator('[data-group="passing"]').text_content() and 'Tackles + interceptions' in detail.locator('[data-group="overview"]').text_content()
+              and '2nd assists' not in detail.text_content() and 'Actual match counts' not in detail.text_content(), 'match detail uses the new columns and has no note')
         page.get_by_role('tab', name='Overview', exact=True).focus()
         page.get_by_role('tab', name='Overview', exact=True).click()
         page.keyboard.press('ArrowRight')
@@ -243,6 +294,9 @@ def main():
         # ---- Several clubs: first visit ----
         page = load(clubs)
         check(summary(page) == ('Alpha United', '3', '1 · 1 · 1', '4 / 4'), 'first visit opens the default club with its own record and goals')
+        check({name: (value.replace(',', '.'), best) for name, (value, best) in table(page, 'goals').items()}
+              == {'Alpha Anchor': ('1.00', True), 'Shared Striker': ('0.33', False)}, 'per-match goals and highlight by default')
+        totals(page)
         check(page.evaluate('window.__requests') == ['data/clubs.json', 'data/clubs/100/index.json'], 'only the selected club dataset is loaded')
         check(page.locator('#club-picker').is_visible() and page.locator('#club-select').input_value() == '100'
               and page.locator('#club-select option').all_inner_texts() == ['Alpha United', 'Beta Town', 'Gamma Empty'], 'selector lists every configured club')
@@ -347,6 +401,7 @@ def main():
         # ---- Rapid switching and late answers ----
         slow = {'data/clubs/200/index.json': 700}
         page = load(clubs, delays=slow)
+        totals(page)
         choose(page, f.BETA, settle=False)
         check(text(page, '#club-name') == 'Beta Town' and text(page, '#match-count') == '0' and 'Loading Beta Town' in text(page, '#player-body')
               and 'Alpha Anchor' not in text(page, 'main'), 'while a club loads, the previous club numbers are already gone')

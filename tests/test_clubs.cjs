@@ -81,7 +81,7 @@ test('view CSV names the club in every row when one is given', () => {
   const row = {id: '500', name: 'Shared Striker', goals: 3, assists: 0, rating: 7.5};
   const players = S.playerTotals([{id: '1', timestamp: null, match_types: ['leagueMatch'], players: [row]}]);
   const lines = S.tableCsv(players, 'shooting', {club: club('200', '=Beta, "Town"')}).replace('﻿', '').trim().split('\r\n');
-  assert.equal(lines[0], 'club_id,club_name,player_id,player_name,appearances,mode,goals,goals_available_matches,shots,shots_available_matches,shots_on_target,shots_on_target_available_matches');
+  assert.equal(lines[0], 'club_id,club_name,player_id,player_name,appearances,mode,goals,goals_available_matches,shots,shots_available_matches,shot_success_rate,shot_success_rate_available_matches');
   assert(lines[1].startsWith('200,"\'=Beta, ""Town""",500,Shared Striker,1,totals,3,1,'));
   assert(!S.tableCsv(players, 'shooting').includes('club_id'));
 });

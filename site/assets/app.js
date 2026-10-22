@@ -91,7 +91,6 @@ function renderPlayers(matches) {
   const body = $("player-body");
   body.replaceChildren();
 
-  $("view-note").textContent = S.VIEWS[activeView].note;
   $("view-count").textContent =
     `${people.length} players · ${perMatch ? "per available match" : "totals"}`;
 
@@ -207,7 +206,7 @@ function renderMatches(matches) {
         const section = node("details", undefined, "match-group"); section.dataset.group = key; section.open = key === "overview";
         section.append(node("summary", view.label), miniTable(m, key)); groups.append(section);
       }
-      detail.append(groups, node("p", `Match ${m.id} · Actual match counts, regardless of the squad's per-match toggle. Outcome: ${m.result_source || "unavailable"}.`, "match-note"));
+      detail.append(groups);
     };
     detail.addEventListener("toggle", expand);
     list.append(detail);

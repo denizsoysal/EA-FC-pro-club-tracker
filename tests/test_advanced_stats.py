@@ -46,8 +46,15 @@ class AdvancedStatsTests(unittest.TestCase):
         self.assertEqual(row['long_pass_attempts'], 5)
         self.assertEqual(row['long_pass_rate'], 60)
 
-    def test_successful_through_balls(self):
-        self.assertEqual(t.normalize_player('500', with_events({152: 7}))['through_balls_completed'], 7)
+    def test_key_passes_come_from_event_152_only(self):
+        self.assertEqual(t.normalize_player('500', with_events({152: 7, 115: 4}))['key_passes'], 7)
+        self.assertEqual(t.normalize_player('500', with_events({115: 4}))['key_passes'], 0)
+
+    def test_tackles_and_interceptions_is_their_sum(self):
+        row = t.normalize_player('500', with_events({229: 5, 230: 2, 6: 4}))
+        self.assertEqual((row['tackles_won'], row['interceptions'], row['tackles_and_interceptions']), (7, 4, 11))
+        raw = player(); del raw[t.BUCKETS[0]]
+        self.assertIsNone(t.normalize_player('500', raw)['tackles_and_interceptions'])
 
     def test_tackles_total_is_sum_of_won_components(self):
         raw = with_events({229: 5, 230: 2, 6: 4, 158: 3})
@@ -100,10 +107,12 @@ class AdvancedStatsTests(unittest.TestCase):
         raw = player(); raw.update(passesmade='', passesMade='15')
         self.assertEqual(t.normalize_player('500', raw)['passes_made'], 15)
 
-    def test_no_key_pass_or_pass_bypass_guess(self):
+    def test_no_pass_bypass_guess_and_second_assists_not_exported(self):
         row = t.normalize_player('500', with_events({115: 3, 152: 5}))
-        self.assertNotIn('key_passes', row)
         self.assertNotIn('players_beaten_by_pass', row)
+        self.assertEqual((row['key_passes'], row['second_assists']), (5, 3))  # 115 is never key passes.
+        self.assertNotIn('second_assists', t.CSV_STATS)
+        self.assertNotIn('through_balls_completed', t.CSV_STATS)
 
     def test_crosses_not_in_normalized_columns(self):
         row = t.normalize_player('500', with_events({36: 4, 37: 2, 157: 6, 11: 1}))
@@ -146,7 +155,7 @@ class AdvancedStatsTests(unittest.TestCase):
             self.assertEqual(t.read_json(path)['raw'], raw)
             self.assertEqual(payload['schema_version'], 2)
             self.assertEqual(payload['matches'][0]['players'][0]['dribble_beats'], 6)
-            self.assertEqual(payload['matches'][0]['players'][0]['through_balls_completed'], 5)
+            self.assertEqual(payload['matches'][0]['players'][0]['key_passes'], 5)
 
     def test_export_contains_selected_metrics_coverage_and_no_crosses(self):
         with tempfile.TemporaryDirectory() as directory:

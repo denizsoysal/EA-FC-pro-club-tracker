@@ -628,7 +628,7 @@ class SiteBuildTests(TempRoot):
         self.build()
         html = (ROOT / 'site/index.html').read_text(encoding='utf-8')
         links = re.findall(r'(?:href|src)="([^"]*)"', html)
-        self.assertIn('assets/clubs.js?v=5', links)
+        self.assertIn('assets/clubs.js?v=6', links)
         for link in links:
             self.assertFalse(link.startswith('/') or '://' in link, link)
         for script in ('app.js', 'clubs.js'):
@@ -662,11 +662,12 @@ class SiteBuildTests(TempRoot):
             with self.assertRaises(ValueError):
                 t.dataset_dir(self.root, {'club_id': bad})
 
-    def test_workflow_collects_every_club_in_the_single_existing_job(self):
+    def test_single_existing_workflow_builds_every_club(self):
         workflows = sorted(path.name for path in (ROOT / '.github/workflows').iterdir())
         self.assertEqual(workflows, ['archive-and-publish.yml'])
         workflow = (ROOT / '.github/workflows/archive-and-publish.yml').read_text(encoding='utf-8')
-        self.assertIn("cron: '7,22,37,52 * * * *'", workflow)
+        # Collection moved to the Raspberry Pi; the single job only builds and publishes.
+        self.assertNotIn('schedule:', workflow)
         self.assertEqual(workflow.count('scripts/tracker.py sync'), 1)
         self.assertEqual(workflow.count('scripts/persist_archive.py'), 1)
         self.assertLess(workflow.index('scripts/tracker.py sync'), workflow.index('scripts/persist_archive.py'))

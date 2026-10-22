@@ -90,7 +90,7 @@ def main():
                 check('Forward' not in head and 'Long' not in head and 'Event coverage' not in head, 'passing table omits removed columns')
                 with page.expect_download() as event: page.locator('#export-view').click()
                 exported = Path(event.value.path()).read_text(encoding='utf-8-sig')
-                check('through_balls_completed' in exported and 'forward_pass' not in exported and 'advanced_records' not in exported, 'actual CSV download has requested columns')
+                check('key_passes' in exported and 'through_balls' not in exported and 'second_assists' not in exported and 'forward_pass' not in exported and 'advanced_records' not in exported, 'actual CSV download has requested columns')
                 if args.screenshots: page.screenshot(path=str(args.screenshots / 'passing-desktop.png'), full_page=True)
                 page.get_by_role('tab', name='Dribbling', exact=True).click()
                 check('Successful dribbles' in page.locator('#player-head').text_content(), 'dribble successes explicitly labelled')
@@ -140,7 +140,8 @@ def main():
                       and all(row.startswith('200,Beta Town,') for row in rows[1:]) and len(rows) == 6, 'all-match CSV download is named for and contains only the selected club')
                 with page.expect_download() as event: page.locator('#export-view').click()
                 exported = Path(event.value.path()).read_text(encoding='utf-8-sig')
-                check(event.value.suggested_filename == 'beta-town-200-overview-totals.csv' and '200,Beta Town,500,Shared Striker,1,totals,3,' in exported, 'view CSV download is named for and labelled with the selected club')
+                check(event.value.suggested_filename == 'beta-town-200-overview-per-match.csv' and '200,Beta Town,500,Shared Striker,1,per_available_match,3,' in exported,
+                      'view CSV download is named for the selected club and uses the per-match default')
                 if args.screenshots: page.screenshot(path=str(args.screenshots / 'clubs-beta-http.png'), full_page=True)
                 page.reload(wait_until='networkidle')
                 check((name(), count()) == ('Beta Town', '2'), 'the shareable address survives a reload')

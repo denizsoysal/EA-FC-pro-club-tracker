@@ -44,7 +44,9 @@ EVENTS = {
     "forward_passes_failed": 31,
     "long_passes_completed": 28,
     "long_passes_failed": 29,
-    "through_balls_completed": 152,
+    # Reported by community decoders as successful through balls; the viewer
+    # labels it "key passes" at the club's request.
+    "key_passes": 152,
     "interceptions": 6,
     "standing_tackles_won": 229,
     "sliding_tackles_won": 230,
@@ -54,11 +56,11 @@ EVENTS = {
 DECODER = "community-selected-stats-v2-unofficial"
 VIEWER_SCHEMA = 2
 CSV_STATS = [
-    "goals", "assists", "second_assists", "rating", "shots", "shots_on_target",
+    "goals", "assists", "rating", "shots", "shots_on_target",
     "passes_made", "pass_attempts", "pass_rate",
-    "through_balls_completed", "dribbles_completed", "dribble_beats", "skill_move_beats",
-    "interceptions", "tackles_won", "standing_tackles_won", "sliding_tackles_won",
-    "opponents_dispossessed",
+    "key_passes", "dribbles_completed", "dribble_beats", "skill_move_beats",
+    "interceptions", "tackles_won", "tackles_and_interceptions",
+    "standing_tackles_won", "sliding_tackles_won", "opponents_dispossessed",
 ]
 MAX_RESPONSE = 15 * 1024 * 1024
 CLUB_KEYS = ("club_id", "club_name", "platform", "edition")
@@ -569,6 +571,7 @@ def normalize_player(pid: str, player: dict) -> dict:
 
     row["dribble_beats"] = None
     row["tackles_won"] = None
+    row["tackles_and_interceptions"] = None
     for prefix in ("forward", "long"):
         row[f"{prefix}_pass_attempts"] = None
     if events is not None:
@@ -580,6 +583,7 @@ def normalize_player(pid: str, player: dict) -> dict:
         else:
             row["dribble_beats"] = beats
         row["tackles_won"] = row["standing_tackles_won"] + row["sliding_tackles_won"]
+        row["tackles_and_interceptions"] = row["tackles_won"] + row["interceptions"]
         for prefix in ("forward", "long"):
             row[f"{prefix}_pass_attempts"] = (row[f"{prefix}_passes_completed"]
                                                + row[f"{prefix}_passes_failed"])

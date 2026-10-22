@@ -17,6 +17,8 @@ from archive_store import ArchiveError, create_backup, repository_lock
 from tracker import load_config, archive_report, archive_failures
 
 ROOT = Path(__file__).resolve().parents[1]
+BOT_NAME = "github-actions[bot]"
+BOT_EMAIL = "41898282+github-actions[bot]@users.noreply.github.com"
 
 
 def git(root: Path, *args: str, check: bool = True) -> subprocess.CompletedProcess:
@@ -63,7 +65,23 @@ def committable(root: Path, *, protect: bool = False) -> tuple[list[str], str]:
     return paths, archive_failures(report)
 
 
-def persist(root: Path, branch: str, *, pause=time.sleep) -> dict:
+def prune_recovery(folder: Path, keep: int, current: Path) -> list[str]:
+    """Delete all but the newest `keep` recovery ZIPs, never the current one.
+
+    Called only after a successful push, when every pruned ZIP's data is also
+    in the remote repository. Names sort by their creation timestamp.
+    """
+    zips = sorted(folder.glob("dubsfc-*.zip"))
+    removed = []
+    for path in zips[:max(len(zips) - keep, 0)]:
+        if path.resolve() != current.resolve():
+            path.unlink()
+            removed.append(path.name)
+    return removed
+
+
+def persist(root: Path, branch: str, *, pause=time.sleep, git_name: str = BOT_NAME,
+            git_email: str = BOT_EMAIL, keep_recovery: int | None = None) -> dict:
     git(root, "check-ref-format", "--branch", branch)
     # This ZIP intentionally copies all bytes even when integrity verification
     # subsequently fails. It is a recovery/forensic copy, not a health certificate.
@@ -84,12 +102,11 @@ def persist(root: Path, branch: str, *, pause=time.sleep) -> dict:
     verify_git_index(root, paths)
     changed = bool(git(root, "diff", "--cached", "--name-only", "--", "data/").stdout.strip())
     if changed:
-        git(root, "-c", "user.name=github-actions[bot]", "-c",
-            "user.email=41898282+github-actions[bot]@users.noreply.github.com",
+        git(root, "-c", f"user.name={git_name}", "-c", f"user.email={git_email}",
             "commit", "-m", "Archive DubsFC match data and retained revisions")
     # Rebase also needs an identity on a fresh hosted runner (no global config).
-    git(root, "config", "user.name", "github-actions[bot]")
-    git(root, "config", "user.email", "41898282+github-actions[bot]@users.noreply.github.com")
+    git(root, "config", "user.name", git_name)
+    git(root, "config", "user.email", git_email)
     # An unchanged workspace can still include a commit from a previous failed
     # push when this helper is retried locally, so always try a normal push.
     for attempt in range(3):
@@ -99,7 +116,11 @@ def persist(root: Path, branch: str, *, pause=time.sleep) -> dict:
                 # Reported only now, after every verified club is safely pushed.
                 raise ArchiveError("Verified club archives were committed and pushed. NOT committed, "
                                    "left untouched for recovery: " + failures)
-            return {"status": "pushed", "new_commit": changed, "recovery_zip": backup["backup"]}
+            result = {"status": "pushed", "new_commit": changed, "recovery_zip": backup["backup"]}
+            if keep_recovery is not None:
+                result["recovery_zips_removed"] = prune_recovery(
+                    Path(backup["backup"]).parent, keep_recovery, Path(backup["backup"]))
+            return result
         if attempt == 2:
             raise ArchiveError("Git push failed; raw data remains in the recovery ZIP. " + push.stderr.strip())
         git(root, "fetch", "origin", f"refs/heads/{branch}")
@@ -120,10 +141,17 @@ def persist(root: Path, branch: str, *, pause=time.sleep) -> dict:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--branch", required=True)
+    parser.add_argument("--git-name", default=BOT_NAME, help="Commit author name")
+    parser.add_argument("--git-email", default=BOT_EMAIL, help="Commit author email")
+    parser.add_argument("--keep-recovery", type=int, metavar="N",
+                        help="After a successful push, keep only the newest N recovery ZIPs (default: keep all)")
     args = parser.parse_args()
+    if args.keep_recovery is not None and args.keep_recovery < 1:
+        parser.error("--keep-recovery must be at least 1")
     try:
         with repository_lock(ROOT):
-            print(persist(ROOT, args.branch))
+            print(persist(ROOT, args.branch, git_name=args.git_name, git_email=args.git_email,
+                          keep_recovery=args.keep_recovery))
         return 0
     except (ArchiveError, OSError) as exc:
         print(f"Archive persistence error: {exc}", file=sys.stderr)
