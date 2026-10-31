@@ -2,7 +2,7 @@
   "club_id": "696276",
   "edition": "fc27",
   "first_archived_at": "2026-10-15T16:25:13+00:00",
-  "last_changed_at": "2026-10-16T16:24:24+00:00",
+  "last_changed_at": "2026-10-31T11:46:44+00:00",
   "match_id": "104604257750465",
   "match_types": [
     "playoffMatch"
@@ -379,7 +379,7 @@
           "parrySaves": "0",
           "passattempts": "12",
           "passesmade": "12",
-          "playername": "ozan_soysal",
+          "playername": "MC_ZinhoSP",
           "pos": "midfielder",
           "punchSaves": "0",
           "rating": "8.00",
@@ -400,7 +400,7 @@
       }
     },
     "timeAgo": {
-      "number": 1,
+      "number": 15,
       "unit": "days"
     },
     "timestamp": 1792080116

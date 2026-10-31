@@ -2,7 +2,7 @@
   "club_id": "696276",
   "edition": "fc27",
   "first_archived_at": "2026-10-15T18:27:19+00:00",
-  "last_changed_at": "2026-10-20T18:28:20+00:00",
+  "last_changed_at": "2026-10-31T11:46:44+00:00",
   "match_id": "105028287600362",
   "match_types": [
     "playoffMatch"
@@ -461,7 +461,7 @@
           "parrySaves": "0",
           "passattempts": "25",
           "passesmade": "16",
-          "playername": "Lory14King",
+          "playername": "BR4ND1_FN",
           "pos": "midfielder",
           "punchSaves": "0",
           "rating": "6.90",
@@ -482,7 +482,7 @@
       }
     },
     "timeAgo": {
-      "number": 5,
+      "number": 15,
       "unit": "days"
     },
     "timestamp": 1792088602

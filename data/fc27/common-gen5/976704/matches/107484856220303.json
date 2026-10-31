@@ -2,7 +2,7 @@
   "club_id": "976704",
   "edition": "fc27",
   "first_archived_at": "2026-10-16T15:34:08+00:00",
-  "last_changed_at": "2026-10-20T15:46:20+00:00",
+  "last_changed_at": "2026-10-31T11:48:18+00:00",
   "match_id": "107484856220303",
   "match_types": [
     "playoffMatch"
@@ -95,38 +95,7 @@
       "302907": {
         "TEAM": "73",
         "date": "1792164597",
-        "details": {
-          "clubId": 302907,
-          "customKit": {
-            "crestAssetId": "99160221",
-            "crestColor": "0",
-            "customAwayKitId": "7641",
-            "customKeeperKitId": "5004",
-            "customKitId": "7672",
-            "customThirdKitId": "7513",
-            "dCustomKit": "0",
-            "kitAColor1": "15921906",
-            "kitAColor2": "592653",
-            "kitAColor3": "15921906",
-            "kitAColor4": "15921906",
-            "kitColor1": "592653",
-            "kitColor2": "15921906",
-            "kitColor3": "592653",
-            "kitColor4": "592653",
-            "kitId": "598016",
-            "kitThrdColor1": "14356498",
-            "kitThrdColor2": "33627",
-            "kitThrdColor3": "14356498",
-            "kitThrdColor4": "6387790",
-            "seasonalKitId": "1076404224",
-            "seasonalTeamId": "131397",
-            "selectedKitType": "0",
-            "stadName": "Stade niveau 1"
-          },
-          "name": "XI VICTORY",
-          "regionId": 5457237,
-          "teamId": 73
-        },
+        "details": null,
         "gameNumber": "0",
         "goals": "3",
         "goalsAgainst": "2",
@@ -168,7 +137,7 @@
             "seasonalKitId": "1076404224",
             "seasonalTeamId": "131397",
             "selectedKitType": "0",
-            "stadName": "Stade de l'UD Almería"
+            "stadName": "Stade de l'UD A"
           },
           "name": "FEN V12",
           "regionId": 5457237,
@@ -441,7 +410,7 @@
       }
     },
     "timeAgo": {
-      "number": 4,
+      "number": 14,
       "unit": "days"
     },
     "timestamp": 1792164597

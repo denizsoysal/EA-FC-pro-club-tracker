@@ -1,5 +1,5 @@
 {
   "cooldown_until": null,
-  "halted": true,
-  "reason": "HTTP 403"
+  "halted": false,
+  "reason": null
 }
