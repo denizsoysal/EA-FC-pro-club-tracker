@@ -2,7 +2,7 @@
   "club_id": "696276",
   "edition": "fc27",
   "first_archived_at": "2026-10-31T11:45:47+00:00",
-  "last_changed_at": "2026-11-01T10:11:43+00:00",
+  "last_changed_at": "2026-11-01T21:39:46+00:00",
   "match_id": "154752146020328",
   "match_types": [
     "leagueMatch"
@@ -113,7 +113,7 @@
             "kitColor2": "5775459",
             "kitColor3": "5775459",
             "kitColor4": "5775459",
-            "kitId": "914866176",
+            "kitId": "88850432",
             "kitThrdColor1": "12706617",
             "kitThrdColor2": "33627",
             "kitThrdColor3": "396864",
@@ -125,7 +125,7 @@
           },
           "name": "SKAB FC B",
           "regionId": 5457237,
-          "teamId": 111678
+          "teamId": 10846
         },
         "gameNumber": "0",
         "goals": "8",
