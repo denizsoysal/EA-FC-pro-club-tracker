@@ -2,7 +2,7 @@
   "club_id": "976704",
   "edition": "fc27",
   "first_archived_at": "2026-11-01T22:42:06+00:00",
-  "last_changed_at": "2026-11-02T22:44:56+00:00",
+  "last_changed_at": "2026-11-03T17:45:07+00:00",
   "match_id": "159620268750107",
   "match_types": [
     "leagueMatch"
@@ -113,7 +113,7 @@
             "kitColor2": "5775459",
             "kitColor3": "5775459",
             "kitColor4": "5775459",
-            "kitId": "1082785792",
+            "kitId": "1088086016",
             "kitThrdColor1": "12706617",
             "kitThrdColor2": "33627",
             "kitThrdColor3": "396864",
@@ -121,11 +121,11 @@
             "seasonalKitId": "1076404224",
             "seasonalTeamId": "131397",
             "selectedKitType": "0",
-            "stadName": "Stade niveau 1"
+            "stadName": "Coliseum"
           },
           "name": "YaR1KiVA FC",
           "regionId": 5457237,
-          "teamId": 132176
+          "teamId": 132823
         },
         "gameNumber": "0",
         "goals": "4",
