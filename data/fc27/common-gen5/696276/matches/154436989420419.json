@@ -2,7 +2,7 @@
   "club_id": "696276",
   "edition": "fc27",
   "first_archived_at": "2026-10-31T11:45:47+00:00",
-  "last_changed_at": "2026-11-03T10:41:29+00:00",
+  "last_changed_at": "2026-11-03T14:11:32+00:00",
   "match_id": "154436989420419",
   "match_types": [
     "leagueMatch"
@@ -95,38 +95,7 @@
       "1979810": {
         "TEAM": "1318",
         "date": "1793441411",
-        "details": {
-          "clubId": 1979810,
-          "customKit": {
-            "crestAssetId": "99160427",
-            "crestColor": "0",
-            "customAwayKitId": "7509",
-            "customKeeperKitId": "5005",
-            "customKitId": "7509",
-            "customThirdKitId": "7511",
-            "dCustomKit": "0",
-            "kitAColor1": "5775459",
-            "kitAColor2": "15921906",
-            "kitAColor3": "15921906",
-            "kitAColor4": "15921906",
-            "kitColor1": "15921906",
-            "kitColor2": "5775459",
-            "kitColor3": "5775459",
-            "kitColor4": "5775459",
-            "kitId": "10797057",
-            "kitThrdColor1": "12706617",
-            "kitThrdColor2": "33627",
-            "kitThrdColor3": "396864",
-            "kitThrdColor4": "5775459",
-            "seasonalKitId": "1076404224",
-            "seasonalTeamId": "131397",
-            "selectedKitType": "0",
-            "stadName": "MATRADE Loftus "
-          },
-          "name": "HASBA CLUB",
-          "regionId": 5457237,
-          "teamId": 1318
-        },
+        "details": null,
         "gameNumber": "0",
         "goals": "5",
         "goalsAgainst": "4",
