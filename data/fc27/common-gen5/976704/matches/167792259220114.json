@@ -2,7 +2,7 @@
   "club_id": "976704",
   "edition": "fc27",
   "first_archived_at": "2026-11-05T01:43:47+00:00",
-  "last_changed_at": "2026-11-05T01:43:47+00:00",
+  "last_changed_at": "2026-11-05T02:14:37+00:00",
   "match_id": "167792259220114",
   "match_types": [
     "leagueMatch"
@@ -147,19 +147,19 @@
           "customKit": {
             "crestAssetId": "99161115",
             "crestColor": "0",
-            "customAwayKitId": "7509",
+            "customAwayKitId": "7521",
             "customKeeperKitId": "5005",
-            "customKitId": "7509",
+            "customKitId": "7517",
             "customThirdKitId": "7511",
             "dCustomKit": "0",
-            "kitAColor1": "5775459",
-            "kitAColor2": "15921906",
-            "kitAColor3": "15921906",
-            "kitAColor4": "15921906",
-            "kitColor1": "15921906",
-            "kitColor2": "5775459",
-            "kitColor3": "5775459",
-            "kitColor4": "5775459",
+            "kitAColor1": "15921906",
+            "kitAColor2": "14356498",
+            "kitAColor3": "592653",
+            "kitAColor4": "592653",
+            "kitColor1": "592653",
+            "kitColor2": "14356498",
+            "kitColor3": "14356498",
+            "kitColor4": "14356498",
             "kitId": "11223040",
             "kitThrdColor1": "12706617",
             "kitThrdColor2": "33627",
@@ -167,7 +167,7 @@
             "kitThrdColor4": "5775459",
             "seasonalKitId": "1076404224",
             "seasonalTeamId": "131397",
-            "selectedKitType": "0",
+            "selectedKitType": "1",
             "stadName": "Stade de l'UD A"
           },
           "name": "FEN V12",
@@ -482,7 +482,7 @@
       }
     },
     "timeAgo": {
-      "number": 28,
+      "number": 59,
       "unit": "minutes"
     },
     "timestamp": 1793841223
