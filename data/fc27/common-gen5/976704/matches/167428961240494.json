@@ -2,7 +2,7 @@
   "club_id": "976704",
   "edition": "fc27",
   "first_archived_at": "2026-11-05T01:13:50+00:00",
-  "last_changed_at": "2026-11-05T22:15:15+00:00",
+  "last_changed_at": "2026-11-05T23:14:14+00:00",
   "match_id": "167428961240494",
   "match_types": [
     "leagueMatch"
@@ -113,19 +113,19 @@
             "kitColor2": "14277081",
             "kitColor3": "8656677",
             "kitColor4": "15921906",
-            "kitId": "11132928",
+            "kitId": "15376384",
             "kitThrdColor1": "11385026",
             "kitThrdColor2": "12591158",
             "kitThrdColor3": "2706590",
             "kitThrdColor4": "22436",
             "seasonalKitId": "1076404224",
             "seasonalTeamId": "131397",
-            "selectedKitType": "1",
+            "selectedKitType": "0",
             "stadName": "Gillette Stadiu"
           },
           "name": "team brakass",
           "regionId": 5457237,
-          "teamId": 1359
+          "teamId": 1877
         },
         "gameNumber": "0",
         "goals": "2",
@@ -441,7 +441,7 @@
       }
     },
     "timeAgo": {
-      "number": 21,
+      "number": 22,
       "unit": "hours"
     },
     "timestamp": 1793840106
