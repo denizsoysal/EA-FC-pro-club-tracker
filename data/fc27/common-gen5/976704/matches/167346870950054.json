@@ -2,7 +2,7 @@
   "club_id": "976704",
   "edition": "fc27",
   "first_archived_at": "2026-11-04T23:43:26+00:00",
-  "last_changed_at": "2026-11-06T23:45:02+00:00",
+  "last_changed_at": "2026-11-07T23:44:01+00:00",
   "match_id": "167346870950054",
   "match_types": [
     "leagueMatch"
@@ -359,7 +359,7 @@
       }
     },
     "timeAgo": {
-      "number": 2,
+      "number": 3,
       "unit": "days"
     },
     "timestamp": 1793835046
