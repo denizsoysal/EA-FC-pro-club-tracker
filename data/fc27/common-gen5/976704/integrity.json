@@ -1,5 +1,13 @@
 {
   "files": {
+    "club_stats/26223b1051354c8172e945bc4ed6d283748aaa79fb557aa98b40cbf66739fe1a.json": {
+      "bytes": 1470,
+      "sha256": "26223b1051354c8172e945bc4ed6d283748aaa79fb557aa98b40cbf66739fe1a"
+    },
+    "club_stats/6fe4c6a10c215e9a687194dcc1e54d9c1893bb8d40c0f5cd8dab1fb8fd07fd45.json": {
+      "bytes": 1466,
+      "sha256": "6fe4c6a10c215e9a687194dcc1e54d9c1893bb8d40c0f5cd8dab1fb8fd07fd45"
+    },
     "matches/102518763150220.json": {
       "bytes": 11711,
       "sha256": "671920353e704d48022df56ce09466d0e6b8fa58be65f1c07637ced3c93d8ea5"
@@ -255,6 +263,14 @@
     "matches/81622137080173.json": {
       "bytes": 11691,
       "sha256": "515b685b50fe3173a57ee05828143e72ab1f75dbaa152c1615e920330ca871c2"
+    },
+    "responses/clubStats/5b79337978667a6ec0a5ef8f45b235b33a6105b76ccc9dd77fb348511e825572.json": {
+      "bytes": 1345,
+      "sha256": "5b79337978667a6ec0a5ef8f45b235b33a6105b76ccc9dd77fb348511e825572"
+    },
+    "responses/clubStats/83cff3bd06d906b9c1b713d2f601e0ad8e5cc7c340a08543bc1b9822e89cdc2d.json": {
+      "bytes": 1349,
+      "sha256": "83cff3bd06d906b9c1b713d2f601e0ad8e5cc7c340a08543bc1b9822e89cdc2d"
     },
     "responses/leagueMatch/0043546aede48b33eeac9e0c3486a9ee49120da2fb90e3e1b1101c4936991084.json": {
       "bytes": 110909,

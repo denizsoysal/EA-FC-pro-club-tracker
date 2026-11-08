@@ -1,0 +1,57 @@
+{
+  "club_id": "2063522",
+  "fetched_at": "2026-11-08T14:08:24+00:00",
+  "for": [
+    {
+      "club_id": "696276",
+      "match_id": "175264287220430"
+    }
+  ],
+  "response": [
+    {
+      "bestDivision": null,
+      "bestFinishGroup": null,
+      "clubId": "2063522",
+      "finishesInDivision1Group1": "0",
+      "finishesInDivision2Group1": "0",
+      "finishesInDivision3Group1": "0",
+      "finishesInDivision4Group1": "0",
+      "finishesInDivision5Group1": "0",
+      "finishesInDivision6Group1": "0",
+      "gamesPlayed": "60",
+      "gamesPlayedPlayoff": "0",
+      "goals": "220",
+      "goalsAgainst": "163",
+      "lastMatch0": "2",
+      "lastMatch1": "1",
+      "lastMatch2": "1",
+      "lastMatch3": "2",
+      "lastMatch4": "1",
+      "lastMatch5": "-1",
+      "lastMatch6": "-1",
+      "lastMatch7": "-1",
+      "lastMatch8": "-1",
+      "lastMatch9": "-1",
+      "lastOpponent0": "1005190",
+      "lastOpponent1": "313076",
+      "lastOpponent2": "135579",
+      "lastOpponent3": "19115",
+      "lastOpponent4": "696276",
+      "lastOpponent5": "19811",
+      "lastOpponent6": "26530",
+      "lastOpponent7": "700517",
+      "lastOpponent8": "1322143",
+      "lastOpponent9": "497412",
+      "leagueAppearances": "60",
+      "losses": "21",
+      "promotions": "3",
+      "relegations": "0",
+      "reputationtier": "0",
+      "skillRating": "1824",
+      "ties": "7",
+      "unbeatenstreak": "0",
+      "wins": "32",
+      "wstreak": "0"
+    }
+  ]
+}
