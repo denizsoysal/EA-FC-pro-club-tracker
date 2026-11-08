@@ -67,6 +67,10 @@ CLUB_KEYS = ("club_id", "club_name", "platform", "edition")
 SAFE_LABEL = r"[a-zA-Z0-9_-]+"
 # Seconds between any two API requests in one run, including across clubs.
 REQUEST_PAUSE = 2
+# Skill ratings are current values only (EA keeps no history), so they are
+# fetched just for recent matches, and at most this many clubs per run.
+STATS_WINDOW = timedelta(hours=48)
+STATS_REQUESTS_PER_RUN = 10
 
 
 class EAError(RuntimeError):
@@ -314,12 +318,16 @@ def validate_matches(data: Any, club_id: str) -> list[dict]:
 
 
 def save_matches(root: Path, config: dict, match_type: str, data: Any,
-                 collected_at: str | None = None) -> dict:
-    """Preserve full responses before validation and ALL versions before updates."""
+                 collected_at: str | None = None, store: ArchiveStore | None = None) -> dict:
+    """Preserve full responses before validation and ALL versions before updates.
+
+    `store` may be this club's ArchiveStore, already prepared in this run.
+    """
     if match_type not in MATCH_TYPES:
         raise ValueError("Unknown match type.")
-    store = ArchiveStore(archive_dir(root, config), config)
-    store.prepare()
+    if store is None or not store.trusted:
+        store = ArchiveStore(archive_dir(root, config), config)
+        store.prepare()
     # Keep the whole returned JSON (both teams, unknown fields, null, even an
     # unexpected error object). Validation only controls admission to the viewer.
     snapshot = store.snapshot(match_type, data)
@@ -432,11 +440,50 @@ def status_lines(report: dict) -> list[str]:
         for match_type, result in club["results"].items():
             lines.append(f"[{label}] {match_type}: received {result['received']}, changed {result['changed']}"
                          + (" (possible gap)" if result.get("possible_gap") else ""))
+        ratings = club.get("skill_ratings") or {}
+        if ratings.get("fetched") or ratings.get("errors"):
+            lines.append(f"[{label}] skill ratings: fetched {ratings['fetched']}"
+                         + (", rest next run" if ratings.get("deferred") else ""))
+        lines.extend(f"[{label}] skill ratings: ERROR {error}" for error in ratings.get("errors", []))
         if club["error"]:
             lines.append(f"[{label}] {club.get('failed_match_type') or 'archive'}: ERROR {club['error']}")
         elif not club["results"]:
             lines.append(f"[{label}] {club['status']}: {club['message']}")
     return lines
+
+
+def opponent_id(raw: dict, club_id: str) -> str | None:
+    others = [key for key, value in (raw.get("clubs") or {}).items()
+              if key != club_id and isinstance(value, dict)]
+    return others[0] if len(others) == 1 and re.fullmatch(r"[0-9]+", others[0]) else None
+
+
+def stats_envelopes(store: ArchiveStore) -> list[dict]:
+    return [read_json(path) for relative, path in sorted(store.files().items())
+            if relative.startswith("club_stats/")]
+
+
+def pending_stats(store: ArchiveStore, club: dict, now: datetime) -> dict[str, list[str]]:
+    """Clubs whose rating is still missing for a recent match: club ID -> match IDs.
+
+    The club itself first, then opponents from the newest match back.
+    """
+    covered = {(str(envelope["club_id"]), str(entry["match_id"]))
+               for envelope in stats_envelopes(store) for entry in envelope["for"]}
+    cutoff = (now - STATS_WINDOW).timestamp()
+    recent = []
+    for path in (store.folder / "matches").glob("*.json"):
+        raw = read_json(path)["raw"]
+        when = number(raw.get("timestamp"))
+        if when is not None and when >= cutoff:
+            recent.append((when, str(raw["matchId"]), opponent_id(raw, club["club_id"])))
+    wanted: dict[str, list[str]] = {}
+    for _, match_id, other in sorted(recent, reverse=True):
+        for club_id in (club["club_id"], other):
+            if club_id and (club_id, match_id) not in covered:
+                wanted.setdefault(club_id, []).append(match_id)
+    own = wanted.pop(club["club_id"], None)
+    return ({club["club_id"]: own} if own else {}) | wanted
 
 
 def collect(root: Path, config: dict, *, event: str = "manual", resume: bool = False,
@@ -474,6 +521,32 @@ def collect(root: Path, config: dict, *, event: str = "manual", resume: bool = F
                         message="Rate-limit cooldown until " + state["cooldown_until"])
     host_path = state_files(root)[0]
     requests, fetched, denied = 0, False, False
+    stats_budget = STATS_REQUESTS_PER_RUN
+
+    def host_failure(exc: Exception, where: str) -> tuple[dict | None, str]:
+        """Persist a host-wide denial or rate limit. Returns the note for clubs
+        not yet requested (None if the failure was not host-wide) and a message suffix."""
+        nonlocal denied
+        code = exc.code if isinstance(exc, EAError) else None
+        if code in (401, 403):
+            denied = True
+            host = read_json(host_path, {"halted": False, "reason": None, "cooldown_until": None})
+            host.update(halted=True, reason=f"HTTP {code}")
+            write_json(host_path, host)
+            return ({"status": "blocked", "message":
+                     f"Not requested: EA denied access (HTTP {code}) {where}. Collection is paused for every club."},
+                    " Further automatic API calls are paused.")
+        if code == 429:
+            denied = True
+            host = read_json(host_path, {"halted": False, "reason": None, "cooldown_until": None})
+            host["cooldown_until"] = cooldown_time(exc.retry_after, utcnow())
+            write_json(host_path, host)
+            return ({"status": "cooldown", "message":
+                     f"Not requested: EA rate-limited this host {where}. Cooldown until {host['cooldown_until']}."},
+                    " A persistent rate-limit cooldown is active.")
+        if isinstance(exc, EAError) and exc.unreachable:
+            return {"status": "skipped", "message": f"Not requested: EA could not be reached {where}."}, ""
+        return None, ""
     # Set once EA denies, rate-limits or cannot be reached: the remaining clubs
     # are not requested in this run.
     stop = None
@@ -505,33 +578,49 @@ def collect(root: Path, config: dict, *, event: str = "manual", resume: bool = F
                         store.http_response(match_type, code, body, ct, truncated))
                 else:
                     payload = fetch("clubs/matches", params)
-                report["results"][match_type] = save_matches(root, club, match_type, payload)
+                report["results"][match_type] = save_matches(root, club, match_type, payload, store=store)
                 fetched = True
             except (EAError, ValueError, OSError) as exc:
                 report.update(status="partial" if report["results"] else "error",
                               needs_attention=True, error=str(exc), failed_match_type=match_type,
                               message="Fetch failed. Existing archived matches have been kept.")
-                code = exc.code if isinstance(exc, EAError) else None
-                where = f"while collecting {club_label(club)}"
-                if code in (401, 403):
-                    denied = True
-                    host = read_json(host_path, {"halted": False, "reason": None, "cooldown_until": None})
-                    host.update(halted=True, reason=f"HTTP {code}")
-                    write_json(host_path, host)
-                    report["message"] += " Further automatic API calls are paused."
-                    stop = {"status": "blocked", "message":
-                            f"Not requested: EA denied access (HTTP {code}) {where}. Collection is paused for every club."}
-                elif code == 429:
-                    denied = True
-                    host = read_json(host_path, {"halted": False, "reason": None, "cooldown_until": None})
-                    host["cooldown_until"] = cooldown_time(exc.retry_after, utcnow())
-                    write_json(host_path, host)
-                    report["message"] += " A persistent rate-limit cooldown is active."
-                    stop = {"status": "cooldown", "message":
-                            f"Not requested: EA rate-limited this host {where}. Cooldown until {host['cooldown_until']}."}
-                elif isinstance(exc, EAError) and exc.unreachable:
-                    stop = {"status": "skipped", "message": f"Not requested: EA could not be reached {where}."}
+                stop, suffix = host_failure(exc, f"while collecting {club_label(club)}")
+                report["message"] += suffix
                 break  # Do not hit this club's other endpoint after a failure/denial.
+        if not stop:
+            # Current skill rating of this club and of recent opponents. A failure
+            # here never affects the matches saved above.
+            ratings = report["skill_ratings"] = {"fetched": 0, "errors": []}
+            for stats_club, match_ids in pending_stats(store, club, now).items():
+                if stats_budget <= 0:
+                    ratings["deferred"] = True
+                    break
+                stats_budget -= 1
+                if requests:
+                    pause(REQUEST_PAUSE)
+                requests += 1
+                report["last_api_attempt_at"] = stamp()
+                params = {"platform": club["platform"], "clubIds": stats_club}
+                try:
+                    if fetch is get_json:
+                        data = fetch("clubs/overallStats", params, raw_sink=lambda code, body, ct, truncated:
+                            store.http_response("clubStats", code, body, ct, truncated))
+                    else:
+                        data = fetch("clubs/overallStats", params)
+                    if not (isinstance(data, list) and any(isinstance(row, dict) and str(row.get("clubId")) == stats_club
+                                                           for row in data)):
+                        raise ValueError(f"EA returned no stats for club {stats_club}.")
+                    fetched = True
+                    store.club_stats({"club_id": stats_club, "fetched_at": stamp(), "response": data,
+                                      "for": [{"club_id": club["club_id"], "match_id": mid} for mid in match_ids]})
+                    ratings["fetched"] += 1
+                except (EAError, ValueError, OSError) as exc:
+                    stop, suffix = host_failure(exc, f"while fetching skill ratings for {club_label(club)}")
+                    if stop:
+                        report.update(status="partial", needs_attention=True, error=str(exc),
+                                      failed_match_type="skill ratings", message=report["message"] + suffix)
+                        break
+                    ratings["errors"].append(f"club {stats_club}: {exc}")
         if any(r.get("possible_gap") for r in report["results"].values()):
             report["message"] += " A full feed had no overlap with the archive: possible missing matches."
             report["needs_attention"] = True
@@ -608,7 +697,20 @@ def club_name(club: dict, fallback: str) -> str:
     return str(details.get("name") or fallback) if isinstance(details, dict) else fallback
 
 
-def normalize_match(record: dict) -> dict:
+def skill_entry(envelope: dict, subject: str, other: str | None, rank: int) -> dict | None:
+    """A club's rating from one stats reply, and how many matches it had played
+    since the match in question (0 = right after it; None = unknown or over 10)."""
+    rows = envelope.get("response") if isinstance(envelope.get("response"), list) else []
+    data = next((row for row in rows if isinstance(row, dict) and str(row.get("clubId")) == subject), None)
+    rating = number(data.get("skillRating")) if data else None
+    if rating is None:
+        return None
+    seen = [i for i in range(10) if other and str(data.get(f"lastOpponent{i}")) == other]
+    return {"rating": rating, "fetched_at": envelope["fetched_at"],
+            "matches_since": seen[rank] if rank < len(seen) else None}
+
+
+def normalize_match(record: dict, skill: dict | None = None) -> dict:
     raw, cid = record["raw"], record["club_id"]
     clubs = raw.get("clubs", {})
     us = clubs.get(cid, {})
@@ -639,6 +741,7 @@ def normalize_match(record: dict) -> dict:
             "goals": goals, "goals_against": conceded, "result": result,
             "result_source": result_source,
             "players": [normalize_player(str(pid), p) for pid, p in players.items() if isinstance(p, dict)],
+            "skill": skill or {"club": None, "opponent": None},
             "first_archived_at": record["first_archived_at"],
             "last_changed_at": record["last_changed_at"]}
 
@@ -655,13 +758,37 @@ def build(root: Path, config: dict, report: dict | None = None) -> dict:
     store = ArchiveStore(archive_dir(root, config), config)
     if store.inventory.exists() or store.journal.exists():
         store.verify()
-    records = []
+    raw_records = []
     for path in sorted((archive_dir(root, config) / "matches").glob("*.json")):
         rec = read_json(path)
         if (rec.get("edition"), rec.get("platform"), rec.get("club_id")) != (
             config["edition"], config["platform"], config["club_id"]):
             raise ValueError(f"Archive identity mismatch in {path.name}.")
-        records.append(normalize_match(rec))
+        raw_records.append(rec)
+    cid = config["club_id"]
+    replies: dict[tuple[str, str], list[dict]] = {}
+    for envelope in stats_envelopes(store):
+        for entry in envelope["for"]:
+            replies.setdefault((str(entry["match_id"]), str(envelope["club_id"])), []).append(envelope)
+    played = [(number(rec["raw"].get("timestamp")), opponent_id(rec["raw"], cid)) for rec in raw_records]
+
+    def skill(rec: dict) -> dict:
+        mid, when, other = rec["match_id"], number(rec["raw"].get("timestamp")), opponent_id(rec["raw"], cid)
+        result = {}
+        for role, subject, against in (("club", cid, other), ("opponent", other, cid)):
+            result[role] = None
+            # The earliest reply after the match is the closest to it.
+            for envelope in sorted(replies.get((mid, subject or ""), []), key=lambda e: e["fetched_at"]):
+                fetched = datetime.fromisoformat(envelope["fetched_at"]).timestamp()
+                # Later matches between the same two clubs come first in both lists.
+                rank = sum(1 for t2, o2 in played if o2 == other and when is not None
+                           and t2 is not None and when < t2 <= fetched)
+                result[role] = skill_entry(envelope, subject, against, rank)
+                if result[role]:
+                    break
+        return result
+
+    records = [normalize_match(rec, skill(rec)) for rec in raw_records]
     records.sort(key=lambda r: (r["timestamp"] or "", r["id"]), reverse=True)
     # Only the club's public identity is published, never the rest of config.json.
     payload = {"schema_version": VIEWER_SCHEMA, "club": club_identity(config), "decoder": DECODER,
@@ -701,7 +828,8 @@ def export_csv(root: Path, payload: dict) -> Path:
     club = payload["club"]
     path = dataset_dir(root, club) / f"player_matches_{club['club_id']}.csv"
     path.parent.mkdir(parents=True, exist_ok=True)
-    fields = ["club_id", "club_name", "match_id", "timestamp", "match_types", "player_id", "player_name",
+    fields = ["club_id", "club_name", "match_id", "timestamp", "match_types", "club_skill_rating",
+              "opponent_skill_rating", "player_id", "player_name",
               "position", *CSV_STATS, "events_status", "data_warnings", "decoder", "mapping_reviewed"]
     with path.open("w", newline="", encoding="utf-8-sig") as handle:
         writer = csv.DictWriter(handle, fieldnames=fields)
@@ -711,6 +839,8 @@ def export_csv(root: Path, payload: dict) -> Path:
                 row = {"club_id": club["club_id"], "club_name": club["club_name"],
                        "match_id": match["id"], "timestamp": match["timestamp"],
                        "match_types": ",".join(match["match_types"]),
+                       "club_skill_rating": ((match.get("skill") or {}).get("club") or {}).get("rating"),
+                       "opponent_skill_rating": ((match.get("skill") or {}).get("opponent") or {}).get("rating"),
                        "player_id": p["id"], "player_name": p["name"]}
                 row.update({key: p[key] for key in fields if key in p})
                 row["data_warnings"] = ";".join(p.get("data_warnings", []))

@@ -39,6 +39,8 @@ for Dubs VzeDoux, FC 27, or every match type**.
 | `standing_tackles_won`, `sliding_tackles_won` | Events 229, 230 |
 | `tackles_won` | Sum of the two won-tackle components |
 | `tackles_and_interceptions` | `tackles_won` + `interceptions`, per match |
+| `skill.club.rating`, `skill.opponent.rating` | `skillRating` from `clubs/overallStats`, the club's current rating when collected (not part of the match record) |
+| `skill.*.matches_since` | Position of the other club in that reply's `lastOpponent0`…`9`: 0 = collected right after the match; empty = unknown or more than 10 matches later |
 | `opponents_dispossessed` | Event 158 |
 
 Primary community source:

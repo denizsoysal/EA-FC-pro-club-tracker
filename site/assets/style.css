@@ -74,6 +74,7 @@ tbody tr:hover{background:#18232e}
 .result.W{background:#243922;color:var(--accent)}
 .result.L{background:#382a2c;color:#f3adb2}
 .opponent{font-size:13px;font-weight:650;overflow-wrap:anywhere}
+.opponent .skill{display:block;margin-top:2px;font-size:11px;font-weight:500;color:var(--muted);font-variant-numeric:tabular-nums}
 .score{font-size:22px;font-weight:700;letter-spacing:2px;text-align:center}
 .match-time{font-size:11px;color:var(--muted)}
 .type-label{text-align:right;color:var(--muted);font-size:10px}

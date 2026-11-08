@@ -111,13 +111,17 @@ def repository_lock(root: Path):
 
 
 class ArchiveStore:
-    GROUPS = ("matches", "revisions", "snapshots", "responses")
+    GROUPS = ("matches", "revisions", "snapshots", "responses", "club_stats")
 
     def __init__(self, folder: Path, identity: dict):
         self.folder = folder
         self.identity = {k: str(identity[k]) for k in ("edition", "platform", "club_id")}
         self.inventory = folder / "integrity.json"
         self.journal = folder / "pending_transaction.json"
+        # True once this object has checked every file and has since changed
+        # files only through write_many. Writers hold repository_lock, so later
+        # writes need to check only the files they touch, not the whole archive.
+        self.trusted = False
 
     def target(self, relative: str) -> Path:
         p = PurePosixPath(relative)
@@ -172,6 +176,16 @@ class ArchiveStore:
                 raise ArchiveError(f"Configured club absent from {relative}")
             if not isinstance(value.get("match_types"), list):
                 raise ArchiveError(f"Missing match types in {relative}")
+        if group == "club_stats":
+            # One club's stats reply, fetched for one or more of this club's matches.
+            if (not isinstance(value, dict) or not re.fullmatch(r"[0-9]+", str(value.get("club_id", "")))
+                    or not isinstance(value.get("fetched_at"), str) or "response" not in value
+                    or not isinstance(value.get("for"), list) or not value["for"]):
+                raise ArchiveError(f"Invalid club stats envelope in {relative}")
+            for entry in value["for"]:
+                if (not isinstance(entry, dict) or str(entry.get("club_id")) != self.identity["club_id"]
+                        or not re.fullmatch(r"[0-9]+", str(entry.get("match_id", "")))):
+                    raise ArchiveError(f"Club stats in {relative} do not belong to this club's matches")
 
     def recover(self) -> bool:
         """Finish a journaled transaction; never overwrite unrelated file edits."""
@@ -215,6 +229,7 @@ class ArchiveStore:
         return True
 
     def verify(self) -> dict:
+        self.trusted = False
         self.recover()
         if not self.inventory.exists():
             raise ArchiveError("History has no checksum baseline yet. Run: python scripts/tracker.py backup")
@@ -233,11 +248,13 @@ class ArchiveStore:
                 raise ArchiveError(f"Checksum mismatch: {relative}. Nothing has been overwritten.")
             self.check_file(relative, body)
             total_bytes += len(body)
+        self.trusted = True
         return {"status": "ok", "club_id": self.identity["club_id"],
                 "matches": sum(p.startswith("matches/") for p in found),
                 "revisions": sum(p.startswith("revisions/") for p in found),
                 "snapshots": sum(p.startswith("snapshots/") for p in found),
                 "http_responses": sum(p.startswith("responses/") for p in found),
+                "club_stats": sum(p.startswith("club_stats/") for p in found),
                 "files_checked": len(found), "bytes_checked": total_bytes}
 
     def prepare(self) -> dict:
@@ -254,7 +271,7 @@ class ArchiveStore:
                 entries[relative] = metadata(body)
             self.folder.mkdir(parents=True, exist_ok=True)
             atomic_bytes(self.inventory, encoded({"version": 1, "identity": self.identity, "files": entries}))
-        self.verify()
+        report = self.verify()
         # Every current version, including a v1 pre-upgrade file, gets an immutable copy.
         manifest = self.manifest()
         additions = {}
@@ -267,16 +284,27 @@ class ArchiveStore:
                 additions[name] = body
         if additions:
             self.write_many(additions)
-        return self.verify()
+            report = self.verify()
+        return report
 
     def write_many(self, values: dict[str, bytes]) -> int:
-        """Journal -> staged bytes -> targets -> inventory. No file deletions."""
-        self.verify()
+        """Journal -> staged bytes -> targets -> inventory. No file deletions.
+
+        The whole archive is checked first unless this object already did so;
+        the files about to be written are always re-checked against the inventory.
+        """
+        if not self.trusted:
+            self.verify()
         manifest = self.manifest()
         changes, bodies = [], []
         for relative, body in values.items():
             self.check_file(relative, body)
             new, old = metadata(body), manifest["files"].get(relative)
+            path = self.target(relative)
+            current = metadata(path.read_bytes()) if path.exists() else None
+            if current != old:
+                self.trusted = False
+                raise ArchiveError(f"Archive file changed outside the collector: {relative}. Nothing has been overwritten.")
             if old == new:
                 continue
             if old is not None and not relative.startswith("matches/"):
@@ -289,15 +317,26 @@ class ArchiveStore:
         stage = self.folder / "_transactions" / transaction
         for n, body in enumerate(bodies):
             atomic_bytes(stage / f"{n}.json", body)
+        self.trusted = False
         atomic_bytes(self.journal, encoded({"version": 1, "id": transaction,
                                           "identity": self.identity, "changes": changes}))
         self.recover()
-        self.verify()
+        # recover() has read back every written file against its new checksum.
+        written = self.manifest()["files"]
+        if any(written.get(change["path"]) != change["new"] for change in changes):
+            raise ArchiveError("Inventory does not record the files just written.")
+        self.trusted = True
         return len(changes)
 
     def snapshot(self, feed: str, data) -> str:
         body = encoded(data)
         relative = f"snapshots/{feed}/{digest(body)}.json"
+        self.write_many({relative: body})
+        return relative
+
+    def club_stats(self, envelope: dict) -> str:
+        body = encoded(envelope)
+        relative = f"club_stats/{digest(body)}.json"
         self.write_many({relative: body})
         return relative
 

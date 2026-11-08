@@ -235,6 +235,13 @@ def main():
         page.locator('#period').select_option('last5')
         check(page.locator('#match-count').inner_text() == '5', 'last-5 archive filter works')
         page.locator('#period').select_option('all')
+        rows = {match['id']: page.locator(f'.match-item[data-match-id="{match["id"]}"]') for match in demo['matches']}
+        check(rows['900000'].locator('.skill').inner_text() == 'SR 1700 vs 1520', 'match row shows both skill ratings')
+        check(rows['900001'].locator('.skill').inner_text() == 'SR 1691 vs ≈1557'
+              and 'after 2 more matches' in rows['900001'].locator('.skill').get_attribute('title')
+              and 'right after this match' in rows['900001'].locator('.skill').get_attribute('title'), 'a rating collected later is marked approximate and explained')
+        check(rows['900013'].locator('.skill').count() == 0 and rows['900013'].locator('.opponent').inner_text() == 'vs Northside FC',
+              'older matches without ratings show no skill line')
         page.locator('.match-item > summary').first.click()
         page.wait_for_selector('.match-group')
         check(page.locator('.match-item').first.locator('.match-group').count() == 5, 'expanded match provides all five statistic groups')

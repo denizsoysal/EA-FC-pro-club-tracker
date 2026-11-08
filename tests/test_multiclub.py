@@ -628,7 +628,7 @@ class SiteBuildTests(TempRoot):
         self.build()
         html = (ROOT / 'site/index.html').read_text(encoding='utf-8')
         links = re.findall(r'(?:href|src)="([^"]*)"', html)
-        self.assertIn('assets/clubs.js?v=6', links)
+        self.assertIn('assets/clubs.js?v=7', links)
         for link in links:
             self.assertFalse(link.startswith('/') or '://' in link, link)
         for script in ('app.js', 'clubs.js'):

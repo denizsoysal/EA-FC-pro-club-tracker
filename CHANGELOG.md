@@ -1,3 +1,15 @@
+# v4.2 — skill ratings, faster runs
+
+- Each match shows both clubs' skill rating. After saving new matches, the
+  collector requests `clubs/overallStats` once per club (EA accepts one club per
+  request) for matches from the last 48 hours, at most 10 requests per run.
+  Replies are archived under `club_stats/` and checksummed. A rating collected
+  after the club played more matches is marked `≈`.
+- A run checks the whole archive once, then only the files it writes.
+- The Raspberry Pi no longer zips the whole archive on every run.
+
+---
+
 # v4.1 — collection moves to a Raspberry Pi
 
 - EA's CDN has answered GitHub's runners with HTTP 403 since 21 October 2026.

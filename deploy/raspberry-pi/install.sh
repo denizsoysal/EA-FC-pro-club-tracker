@@ -23,7 +23,7 @@ Type=oneshot
 User=$user
 WorkingDirectory=$repo
 ExecStart=/usr/bin/env bash $repo/deploy/raspberry-pi/collect.sh
-TimeoutStartSec=15min
+TimeoutStartSec=25min
 Nice=10
 EOF
 

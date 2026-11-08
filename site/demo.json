@@ -9,19 +9,19 @@
   "collection": {
     "last_api_attempt_at": null,
     "message": "Synthetic demonstration only. No EA data or real collection status.",
-    "run_at": "2026-10-22T09:42:59+00:00",
+    "run_at": "2026-11-08T12:45:15+00:00",
     "status": "demo"
   },
   "decoder": "community-selected-stats-v2-unofficial",
-  "generated_at": "2026-10-22T09:42:59+00:00",
+  "generated_at": "2026-11-08T12:45:15+00:00",
   "mapping_reviewed": false,
   "matches": [
     {
-      "first_archived_at": "2026-10-22T08:42:59+00:00",
+      "first_archived_at": "2026-11-08T11:45:15+00:00",
       "goals": 4,
       "goals_against": 1,
       "id": "900000",
-      "last_changed_at": "2026-10-22T08:42:59+00:00",
+      "last_changed_at": "2026-11-08T11:45:15+00:00",
       "match_types": [
         "playoffMatch"
       ],
@@ -225,14 +225,26 @@
       ],
       "result": "W",
       "result_source": "synthetic demonstration",
-      "timestamp": "2026-10-22T08:42:59+00:00"
+      "skill": {
+        "club": {
+          "fetched_at": "2026-11-08T11:45:15+00:00",
+          "matches_since": 0,
+          "rating": 1700
+        },
+        "opponent": {
+          "fetched_at": "2026-11-08T11:45:15+00:00",
+          "matches_since": 0,
+          "rating": 1520
+        }
+      },
+      "timestamp": "2026-11-08T11:45:15+00:00"
     },
     {
-      "first_archived_at": "2026-10-22T06:42:59+00:00",
+      "first_archived_at": "2026-11-08T09:45:15+00:00",
       "goals": 2,
       "goals_against": 0,
       "id": "900001",
-      "last_changed_at": "2026-10-22T06:42:59+00:00",
+      "last_changed_at": "2026-11-08T09:45:15+00:00",
       "match_types": [
         "leagueMatch"
       ],
@@ -436,14 +448,26 @@
       ],
       "result": "W",
       "result_source": "synthetic demonstration",
-      "timestamp": "2026-10-22T06:42:59+00:00"
+      "skill": {
+        "club": {
+          "fetched_at": "2026-11-08T09:45:15+00:00",
+          "matches_since": 0,
+          "rating": 1691
+        },
+        "opponent": {
+          "fetched_at": "2026-11-08T09:45:15+00:00",
+          "matches_since": 2,
+          "rating": 1557
+        }
+      },
+      "timestamp": "2026-11-08T09:45:15+00:00"
     },
     {
-      "first_archived_at": "2026-10-22T04:42:59+00:00",
+      "first_archived_at": "2026-11-08T07:45:15+00:00",
       "goals": 1,
       "goals_against": 2,
       "id": "900002",
-      "last_changed_at": "2026-10-22T04:42:59+00:00",
+      "last_changed_at": "2026-11-08T07:45:15+00:00",
       "match_types": [
         "leagueMatch"
       ],
@@ -647,14 +671,26 @@
       ],
       "result": "L",
       "result_source": "synthetic demonstration",
-      "timestamp": "2026-10-22T04:42:59+00:00"
+      "skill": {
+        "club": {
+          "fetched_at": "2026-11-08T07:45:15+00:00",
+          "matches_since": 0,
+          "rating": 1682
+        },
+        "opponent": {
+          "fetched_at": "2026-11-08T07:45:15+00:00",
+          "matches_since": 0,
+          "rating": 1594
+        }
+      },
+      "timestamp": "2026-11-08T07:45:15+00:00"
     },
     {
-      "first_archived_at": "2026-10-21T08:42:59+00:00",
+      "first_archived_at": "2026-11-07T11:45:15+00:00",
       "goals": 3,
       "goals_against": 3,
       "id": "900003",
-      "last_changed_at": "2026-10-21T08:42:59+00:00",
+      "last_changed_at": "2026-11-07T11:45:15+00:00",
       "match_types": [
         "leagueMatch"
       ],
@@ -858,14 +894,26 @@
       ],
       "result": "D",
       "result_source": "synthetic demonstration",
-      "timestamp": "2026-10-21T08:42:59+00:00"
+      "skill": {
+        "club": {
+          "fetched_at": "2026-11-07T11:45:15+00:00",
+          "matches_since": 0,
+          "rating": 1673
+        },
+        "opponent": {
+          "fetched_at": "2026-11-07T11:45:15+00:00",
+          "matches_since": 0,
+          "rating": 1631
+        }
+      },
+      "timestamp": "2026-11-07T11:45:15+00:00"
     },
     {
-      "first_archived_at": "2026-10-21T06:42:59+00:00",
+      "first_archived_at": "2026-11-07T09:45:15+00:00",
       "goals": 5,
       "goals_against": 2,
       "id": "900004",
-      "last_changed_at": "2026-10-21T06:42:59+00:00",
+      "last_changed_at": "2026-11-07T09:45:15+00:00",
       "match_types": [
         "friendlyMatch"
       ],
@@ -1069,14 +1117,26 @@
       ],
       "result": "W",
       "result_source": "synthetic demonstration",
-      "timestamp": "2026-10-21T06:42:59+00:00"
+      "skill": {
+        "club": {
+          "fetched_at": "2026-11-07T09:45:15+00:00",
+          "matches_since": 0,
+          "rating": 1664
+        },
+        "opponent": {
+          "fetched_at": "2026-11-07T09:45:15+00:00",
+          "matches_since": 2,
+          "rating": 1668
+        }
+      },
+      "timestamp": "2026-11-07T09:45:15+00:00"
     },
     {
-      "first_archived_at": "2026-10-21T04:42:59+00:00",
+      "first_archived_at": "2026-11-07T07:45:15+00:00",
       "goals": 2,
       "goals_against": 1,
       "id": "900005",
-      "last_changed_at": "2026-10-21T04:42:59+00:00",
+      "last_changed_at": "2026-11-07T07:45:15+00:00",
       "match_types": [
         "playoffMatch"
       ],
@@ -1280,14 +1340,26 @@
       ],
       "result": "W",
       "result_source": "synthetic demonstration",
-      "timestamp": "2026-10-21T04:42:59+00:00"
+      "skill": {
+        "club": {
+          "fetched_at": "2026-11-07T07:45:15+00:00",
+          "matches_since": 0,
+          "rating": 1655
+        },
+        "opponent": {
+          "fetched_at": "2026-11-07T07:45:15+00:00",
+          "matches_since": 0,
+          "rating": 1705
+        }
+      },
+      "timestamp": "2026-11-07T07:45:15+00:00"
     },
     {
-      "first_archived_at": "2026-10-20T08:42:59+00:00",
+      "first_archived_at": "2026-11-06T11:45:15+00:00",
       "goals": 1,
       "goals_against": 0,
       "id": "900006",
-      "last_changed_at": "2026-10-20T08:42:59+00:00",
+      "last_changed_at": "2026-11-06T11:45:15+00:00",
       "match_types": [
         "leagueMatch"
       ],
@@ -1491,14 +1563,26 @@
       ],
       "result": "W",
       "result_source": "synthetic demonstration",
-      "timestamp": "2026-10-20T08:42:59+00:00"
+      "skill": {
+        "club": {
+          "fetched_at": "2026-11-06T11:45:15+00:00",
+          "matches_since": 0,
+          "rating": 1646
+        },
+        "opponent": {
+          "fetched_at": "2026-11-06T11:45:15+00:00",
+          "matches_since": 0,
+          "rating": 1742
+        }
+      },
+      "timestamp": "2026-11-06T11:45:15+00:00"
     },
     {
-      "first_archived_at": "2026-10-20T06:42:59+00:00",
+      "first_archived_at": "2026-11-06T09:45:15+00:00",
       "goals": 4,
       "goals_against": 1,
       "id": "900007",
-      "last_changed_at": "2026-10-20T06:42:59+00:00",
+      "last_changed_at": "2026-11-06T09:45:15+00:00",
       "match_types": [
         "leagueMatch"
       ],
@@ -1702,14 +1786,26 @@
       ],
       "result": "W",
       "result_source": "synthetic demonstration",
-      "timestamp": "2026-10-20T06:42:59+00:00"
+      "skill": {
+        "club": {
+          "fetched_at": "2026-11-06T09:45:15+00:00",
+          "matches_since": 0,
+          "rating": 1637
+        },
+        "opponent": {
+          "fetched_at": "2026-11-06T09:45:15+00:00",
+          "matches_since": 2,
+          "rating": 1779
+        }
+      },
+      "timestamp": "2026-11-06T09:45:15+00:00"
     },
     {
-      "first_archived_at": "2026-10-20T04:42:59+00:00",
+      "first_archived_at": "2026-11-06T07:45:15+00:00",
       "goals": 2,
       "goals_against": 0,
       "id": "900008",
-      "last_changed_at": "2026-10-20T04:42:59+00:00",
+      "last_changed_at": "2026-11-06T07:45:15+00:00",
       "match_types": [
         "leagueMatch"
       ],
@@ -1913,14 +2009,26 @@
       ],
       "result": "W",
       "result_source": "synthetic demonstration",
-      "timestamp": "2026-10-20T04:42:59+00:00"
+      "skill": {
+        "club": {
+          "fetched_at": "2026-11-06T07:45:15+00:00",
+          "matches_since": 0,
+          "rating": 1628
+        },
+        "opponent": {
+          "fetched_at": "2026-11-06T07:45:15+00:00",
+          "matches_since": 0,
+          "rating": 1556
+        }
+      },
+      "timestamp": "2026-11-06T07:45:15+00:00"
     },
     {
-      "first_archived_at": "2026-10-19T08:42:59+00:00",
+      "first_archived_at": "2026-11-05T11:45:15+00:00",
       "goals": 1,
       "goals_against": 2,
       "id": "900009",
-      "last_changed_at": "2026-10-19T08:42:59+00:00",
+      "last_changed_at": "2026-11-05T11:45:15+00:00",
       "match_types": [
         "friendlyMatch"
       ],
@@ -2124,14 +2232,18 @@
       ],
       "result": "L",
       "result_source": "synthetic demonstration",
-      "timestamp": "2026-10-19T08:42:59+00:00"
+      "skill": {
+        "club": null,
+        "opponent": null
+      },
+      "timestamp": "2026-11-05T11:45:15+00:00"
     },
     {
-      "first_archived_at": "2026-10-19T06:42:59+00:00",
+      "first_archived_at": "2026-11-05T09:45:15+00:00",
       "goals": 3,
       "goals_against": 3,
       "id": "900010",
-      "last_changed_at": "2026-10-19T06:42:59+00:00",
+      "last_changed_at": "2026-11-05T09:45:15+00:00",
       "match_types": [
         "playoffMatch"
       ],
@@ -2335,14 +2447,18 @@
       ],
       "result": "D",
       "result_source": "synthetic demonstration",
-      "timestamp": "2026-10-19T06:42:59+00:00"
+      "skill": {
+        "club": null,
+        "opponent": null
+      },
+      "timestamp": "2026-11-05T09:45:15+00:00"
     },
     {
-      "first_archived_at": "2026-10-19T04:42:59+00:00",
+      "first_archived_at": "2026-11-05T07:45:15+00:00",
       "goals": 5,
       "goals_against": 2,
       "id": "900011",
-      "last_changed_at": "2026-10-19T04:42:59+00:00",
+      "last_changed_at": "2026-11-05T07:45:15+00:00",
       "match_types": [
         "leagueMatch"
       ],
@@ -2546,14 +2662,18 @@
       ],
       "result": "W",
       "result_source": "synthetic demonstration",
-      "timestamp": "2026-10-19T04:42:59+00:00"
+      "skill": {
+        "club": null,
+        "opponent": null
+      },
+      "timestamp": "2026-11-05T07:45:15+00:00"
     },
     {
-      "first_archived_at": "2026-10-18T08:42:59+00:00",
+      "first_archived_at": "2026-11-04T11:45:15+00:00",
       "goals": 2,
       "goals_against": 1,
       "id": "900012",
-      "last_changed_at": "2026-10-18T08:42:59+00:00",
+      "last_changed_at": "2026-11-04T11:45:15+00:00",
       "match_types": [
         "leagueMatch"
       ],
@@ -2757,14 +2877,18 @@
       ],
       "result": "W",
       "result_source": "synthetic demonstration",
-      "timestamp": "2026-10-18T08:42:59+00:00"
+      "skill": {
+        "club": null,
+        "opponent": null
+      },
+      "timestamp": "2026-11-04T11:45:15+00:00"
     },
     {
-      "first_archived_at": "2026-10-18T06:42:59+00:00",
+      "first_archived_at": "2026-11-04T09:45:15+00:00",
       "goals": 1,
       "goals_against": 0,
       "id": "900013",
-      "last_changed_at": "2026-10-18T06:42:59+00:00",
+      "last_changed_at": "2026-11-04T09:45:15+00:00",
       "match_types": [
         "leagueMatch"
       ],
@@ -2968,7 +3092,11 @@
       ],
       "result": "W",
       "result_source": "synthetic demonstration",
-      "timestamp": "2026-10-18T06:42:59+00:00"
+      "skill": {
+        "club": null,
+        "opponent": null
+      },
+      "timestamp": "2026-11-04T09:45:15+00:00"
     }
   ],
   "persistent_state": {},

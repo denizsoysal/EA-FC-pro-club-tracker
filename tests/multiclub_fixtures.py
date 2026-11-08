@@ -62,23 +62,46 @@ FEEDS = {(ALPHA, 'leagueMatch'): [DERBY, ALPHA_LOSS], (ALPHA, 'playoffMatch'): [
          (BETA, 'leagueMatch'): [DERBY, BETA_WIN], (BETA, 'playoffMatch'): []}
 
 
-def fetcher(feeds=None, failures=None):
-    """A mocked API client. Returns (fetch, calls); calls lists (club_id, match_type)."""
-    feeds, failures, calls = FEEDS if feeds is None else feeds, failures or {}, []
+def fetcher(feeds=None, failures=None, stats=None):
+    """A mocked API client. Returns (fetch, calls).
+
+    calls lists (club_id, match_type) for match feeds and (club_id, 'overallStats')
+    for club stats. `stats` maps a club ID to its stats reply or an exception;
+    failures maps a (club_id, kind) key to an exception.
+    """
+    feeds, failures, stats, calls = FEEDS if feeds is None else feeds, failures or {}, stats or {}, []
 
     def fetch(endpoint, params):
+        assert ',' not in params['clubIds'], 'one club per request'
+        if endpoint == 'clubs/overallStats':
+            key = (params['clubIds'], 'overallStats')
+            calls.append(key)
+            reply = failures.get(key, stats.get(key[0], []))
+            if isinstance(reply, Exception):
+                raise reply
+            return copy.deepcopy(reply)
+        assert endpoint == 'clubs/matches', endpoint
         key = (params['clubIds'], params['matchType'])
         calls.append(key)
-        assert endpoint == 'clubs/matches' and ',' not in key[0], 'one club per request'
         if key in failures:
             raise failures[key]
         return copy.deepcopy(feeds.get(key, []))
     return fetch, calls
 
 
+def stats_reply(club_id, rating, opponents=(), **extra):
+    """An overallStats reply as EA sends it: one club, values as strings,
+    lastOpponent0 = most recent opponent, -1 when fewer than 10 matches."""
+    row = {'clubId': club_id, 'skillRating': str(rating), 'gamesPlayed': '40', 'unknown_future_field': {'keep': 1}}
+    padded = list(opponents) + ['-1'] * (10 - len(opponents))
+    row.update({f'lastOpponent{i}': str(o) for i, o in enumerate(padded)})
+    row.update(extra)
+    return [row]
+
+
 def sync(root, cfg, **options):
     """One mocked collection run over every configured club, without pauses."""
-    fetch, calls = fetcher(options.pop('feeds', None), options.pop('failures', None))
+    fetch, calls = fetcher(options.pop('feeds', None), options.pop('failures', None), options.pop('stats', None))
     report = t.collect(root, cfg, fetch=fetch, pause=lambda _: None, **options)
     return report, calls
 

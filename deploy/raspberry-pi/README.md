@@ -387,9 +387,9 @@ keys** → delete "Raspberry Pi". Nothing else on your account is affected.
 - Commits are authored "DubsFC Raspberry Pi collector". To change the name or
   email, set `DUBSFC_GIT_NAME` / `DUBSFC_GIT_EMAIL` as `Environment=` lines in
   `/etc/systemd/system/dubsfc-collector.service`.
-- Each run also writes a recovery ZIP to `.runtime/recovery/`. After a
-  successful push only the newest 10 are kept (`DUBSFC_KEEP_RECOVERY`); after a
-  failed push all are kept.
+- The Pi makes no per-run ZIP backup: the archive stays on its card, and data
+  that could not be pushed stays in a local commit for the next run. Keep an
+  occasional `python3 scripts/tracker.py backup` copy elsewhere if you want one.
 - **Why every 30 minutes?** EA's feed holds only the last 10 matches of each
   competition. The archive shows Dubs once played 10 league matches in 2.9
   hours, so twice an hour leaves a wide margin. Asking more often would not save

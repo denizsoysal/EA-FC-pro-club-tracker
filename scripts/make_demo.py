@@ -53,10 +53,15 @@ for i in range(14):
                 p[key] = ''
         players.append(t.normalize_player(str(1000 + j), p))
     kind = 'friendlyMatch' if i in (4, 9) else 'playoffMatch' if i % 5 == 0 else 'leagueMatch'
+    # Ratings exist only for recent matches; some opponents had played on before collection.
+    skill = ({'club': {'rating': 1700 - 9 * i, 'fetched_at': when, 'matches_since': 0},
+              'opponent': {'rating': 1520 + (37 * i) % 260, 'fetched_at': when,
+                           'matches_since': 2 if i % 3 == 1 else 0}}
+             if i < 9 else {'club': None, 'opponent': None})
     matches.append({'id': str(900000 + i), 'timestamp': when, 'match_types': [kind],
                     'opponent': opponents[i % len(opponents)], 'goals': goals, 'goals_against': conceded,
                     'result': 'W' if goals > conceded else 'D' if goals == conceded else 'L',
-                    'result_source': 'synthetic demonstration', 'players': players,
+                    'result_source': 'synthetic demonstration', 'players': players, 'skill': skill,
                     'first_archived_at': when, 'last_changed_at': when})
 payload = {'schema_version': t.VIEWER_SCHEMA, 'club': club, 'decoder': t.DECODER,
            'mapping_reviewed': False, 'generated_at': t.stamp(now),

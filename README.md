@@ -143,6 +143,23 @@ community-reported; seeing an event ID in your data does not validate its meanin
 
 See [stat definitions](docs/STAT_DEFINITIONS.md).
 
+### Skill ratings
+
+Each match row shows both clubs' skill rating, for example `SR 1808 vs ≈1937`.
+EA's match records do not contain it, and EA keeps no history of it: its club
+stats only give a club's **current** rating. After each run saves new matches,
+the collector therefore asks EA for the current rating of the club and of each
+recent opponent: one request per club, at most 10 per run, paced like every
+other request. Only matches from the last 48 hours get a rating; older matches
+stay blank rather than show a much later value.
+
+The same reply lists the club's last 10 opponents, including friendlies. That
+tells how many matches the club had played between the match and the moment
+the rating was collected. A plain number was collected right after the match;
+`≈` means the club had played more matches by then (hover for how many). A
+rating collected right after the match already includes that match's result.
+The all-match CSV has `club_skill_rating` and `opponent_skill_rating` columns.
+
 ## Collection commands
 
 ```powershell
@@ -185,6 +202,7 @@ data/
     │   ├── revisions/<match_id>/<sha256>.json   every distinct accepted version
     │   ├── snapshots/<match_type>/<sha256>.json entire decoded endpoint responses
     │   ├── responses/<match_type>/<sha256>.json captured HTTP response bodies
+    │   ├── club_stats/<sha256>.json             club stats replies (skill ratings)
     │   └── integrity.json                       protected-file SHA-256 inventory
     └── 976704/
         └── (the same layout, with its own inventory)

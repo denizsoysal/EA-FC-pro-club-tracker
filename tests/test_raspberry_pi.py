@@ -149,6 +149,12 @@ class PersistOptionsTests(Remote):
                 p.persist(self.work, 'main', pause=lambda _: None, keep_recovery=1)
         self.assertEqual(len(self.recovery()), 3)
 
+    def test_recovery_zip_can_be_skipped(self):
+        self.add_match('9130')
+        result = p.persist(self.work, 'main', pause=lambda _: None, recovery_zip=False, keep_recovery=1)
+        self.assertEqual((result['status'], result['recovery_zip']), ('pushed', None))
+        self.assertEqual(self.recovery(), [])
+
     def test_prune_never_removes_the_current_zip(self):
         folder = self.base / 'zips'; folder.mkdir()
         for name in ('dubsfc-1.zip', 'dubsfc-2.zip', 'dubsfc-3.zip', 'other.zip'):
@@ -205,7 +211,7 @@ class CollectScriptTests(Remote):
         self.run_collect()
         self.assertEqual(sorted(path.stem for path in (self.clone('again') / 'data/fc27/common-gen5/200/matches').glob('*.json')),
                          ['9001', '9004', '9200'])
-        self.assertLessEqual(len(self.recovery()), 2)
+        self.assertEqual(self.recovery(), [])  # The Pi writes no per-run ZIP of the whole archive.
 
     def test_code_pushed_from_elsewhere_is_picked_up_before_collecting(self):
         other = self.clone('laptop')
@@ -240,7 +246,9 @@ class CollectScriptTests(Remote):
         output = self.run_collect(expect=1)
         self.assertIn('push=1', output)
         self.assertTrue((self.work / 'data/fc27/common-gen5/100/matches/9300.json').is_file())
-        self.assertEqual(len(self.recovery()), 1)
+        # Kept on the card in a local commit, pushed by a later run.
+        self.assertEqual(p.git(self.work, 'status', '--porcelain', '--', 'data/').stdout, '')
+        self.assertIn('Archive DubsFC', p.git(self.work, 'log', '-1', '--format=%s').stdout)
 
 
 class PublishOnlyWorkflowTests(unittest.TestCase):

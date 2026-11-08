@@ -188,6 +188,36 @@ class ArchiveSafetyTests(unittest.TestCase):
         self.assertIn([later], [a.load(p) for p in (self.store.folder / 'snapshots').rglob('*.json')])
         self.store.verify()
 
+    def test_one_full_check_per_store_then_only_touched_files(self):
+        self.store.prepare()
+        calls = []
+        real = a.ArchiveStore.verify
+        def counting(store):
+            calls.append(store)
+            return real(store)
+        with patch.object(a.ArchiveStore, 'verify', counting):
+            t.save_matches(self.root, self.cfg, 'leagueMatch', [match()], store=self.store)
+            t.save_matches(self.root, self.cfg, 'leagueMatch', [match('901')], store=self.store)
+        self.assertEqual(calls, [])
+        self.assertEqual(self.store.verify()['matches'], 2)  # The full check still agrees afterwards.
+
+    def test_trusted_store_still_refuses_a_file_changed_behind_its_back(self):
+        self.save([match()])
+        self.store.prepare()
+        self.path().write_bytes(self.path().read_bytes().replace(b'Synthetic Player', b'Edited Player'))
+        later = match(); later['players']['100']['500']['rating'] = '9.0'
+        with self.assertRaisesRegex(a.ArchiveError, 'changed outside the collector'):
+            t.save_matches(self.root, self.cfg, 'leagueMatch', [later], store=self.store)
+        self.assertIn(b'Edited Player', self.path().read_bytes())
+        with self.assertRaisesRegex(a.ArchiveError, 'Checksum mismatch'):
+            self.store.verify()
+
+    def test_untrusted_store_is_checked_in_full_before_writing(self):
+        self.save([match()])
+        (self.path().parent / '999.json').write_text('{}')
+        with self.assertRaisesRegex(a.ArchiveError, 'Untracked'):
+            t.save_matches(self.root, self.cfg, 'leagueMatch', [match('902')], store=self.store)
+
     def test_immutable_object_cannot_be_replaced(self):
         self.save([match()])
         relative = next(p for p in self.store.files() if p.startswith('snapshots/'))

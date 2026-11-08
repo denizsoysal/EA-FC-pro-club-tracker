@@ -20,6 +20,20 @@ function dateText(value) {
   const date = new Date(value);
   return Number.isNaN(date.getTime()) ? "Date unavailable" : date.toLocaleString(undefined, {month:"short", day:"numeric", year:"numeric", hour:"2-digit", minute:"2-digit"});
 }
+// "SR 1808 vs ≈1758": both clubs' skill ratings, collected after the match.
+// "≈" marks a rating collected after that club had played more matches.
+function skillLine(m) {
+  const own = m.skill?.club, them = m.skill?.opponent;
+  if (!S.finite(own?.rating) && !S.finite(them?.rating)) return null;
+  const value = entry => S.finite(entry?.rating) ? (entry.matches_since === 0 ? "" : "≈") + Math.round(entry.rating) : "—";
+  const when = entry => !S.finite(entry?.rating) ? "not available"
+    : entry.matches_since === 0 ? "collected right after this match"
+    : entry.matches_since > 0 ? `collected after ${entry.matches_since} more match${entry.matches_since === 1 ? "" : "es"}`
+    : "collected more than 10 matches later";
+  const line = node("span", `SR ${value(own)} vs ${value(them)}`, "skill");
+  line.title = `Skill rating (SR) after the match. ${club ? club.club_name : "Your club"}: ${when(own)}. ${m.opponent}: ${when(them)}.`;
+  return line;
+}
 function filteredMatches() {
   return S.filterMatches(archive.matches, {period: $("period").value, competition: $("competition").value});
 }
@@ -188,6 +202,11 @@ function miniTable(match, view) {
   }
   return wrap;
 }
+function opponentCell(m) {
+  const cell = node("span", `vs ${m.opponent}`, "opponent"), skill = skillLine(m);
+  if (skill) cell.append(skill);
+  return cell;
+}
 function renderMatches(matches) {
   const list = $("match-list"), opened = new Set([...list.querySelectorAll(".match-item[open]")].map(el => el.dataset.matchId));
   list.replaceChildren(); $("matches-label").textContent = `${matches.length} matches · most recent first`;
@@ -195,7 +214,7 @@ function renderMatches(matches) {
   for (const m of matches.slice(0, matchLimit)) {
     const detail = node("details", undefined, "match-item"), summary = node("summary"); detail.dataset.matchId = m.id;
     summary.append(node("span", m.result || "?", `result ${["W", "D", "L"].includes(m.result) ? m.result : ""}`), node("span", dateText(m.timestamp), "match-time"),
-      node("span", `vs ${m.opponent}`, "opponent"), node("span", `${format(m.goals)}:${format(m.goals_against)}`, "score"), node("span", m.match_types.map(t => labels[t] || t).join(" / "), "type-label"));
+      opponentCell(m), node("span", `${format(m.goals)}:${format(m.goals_against)}`, "score"), node("span", m.match_types.map(t => labels[t] || t).join(" / "), "type-label"));
     detail.append(summary);
     let loaded = false;
     const expand = () => {

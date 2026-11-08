@@ -13,7 +13,6 @@ cd "$(dirname "$0")/../.." || exit 1
 branch="${DUBSFC_BRANCH:-main}"
 name="${DUBSFC_GIT_NAME:-DubsFC Raspberry Pi collector}"
 email="${DUBSFC_GIT_EMAIL:-dubsfc-pi@users.noreply.github.com}"
-keep="${DUBSFC_KEEP_RECOVERY:-10}"
 
 if [[ "${1:-}" == "--resume" ]]; then
   # Manual: clears a persistent 401/403 pause, never a rate-limit cooldown.
@@ -31,7 +30,8 @@ python3 scripts/tracker.py sync "${sync_args[@]}"
 sync_status=$?
 
 # Runs even when the sync or viewer build failed: accepted matches are on disk.
-python3 scripts/persist_archive.py --branch "$branch" --git-name "$name" --git-email "$email" --keep-recovery "$keep"
+# No recovery ZIP: the archive and its unpushed commits stay on this card.
+python3 scripts/persist_archive.py --branch "$branch" --git-name "$name" --git-email "$email" --no-recovery-zip
 persist_status=$?
 
 python3 scripts/tracker.py check-status

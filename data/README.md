@@ -10,6 +10,8 @@ club folder is independent and has these protected groups:
 - revisions/: retained versions of changed match records;
 - snapshots/: complete decoded endpoint responses;
 - responses/: captured HTTP response bodies in JSON envelopes;
+- club_stats/: EA club stats replies (skill ratings) with the matches they were
+  fetched for and when;
 - integrity.json: SHA-256 inventory used to detect missing or altered files.
 
 Empty API responses never delete saved records. Duplicate data is deduplicated.

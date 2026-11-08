@@ -81,13 +81,17 @@ def prune_recovery(folder: Path, keep: int, current: Path) -> list[str]:
 
 
 def persist(root: Path, branch: str, *, pause=time.sleep, git_name: str = BOT_NAME,
-            git_email: str = BOT_EMAIL, keep_recovery: int | None = None) -> dict:
+            git_email: str = BOT_EMAIL, keep_recovery: int | None = None,
+            recovery_zip: bool = True) -> dict:
     git(root, "check-ref-format", "--branch", branch)
     # This ZIP intentionally copies all bytes even when integrity verification
     # subsequently fails. It is a recovery/forensic copy, not a health certificate.
     from datetime import datetime, timezone
     name = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S_%fZ")
-    backup = create_backup(root, root / ".runtime" / "recovery" / f"dubsfc-{name}.zip")
+    # Optional where the archive already lives on durable local storage (the
+    # Raspberry Pi): zipping it all on every run costs minutes and card wear.
+    backup = (create_backup(root, root / ".runtime" / "recovery" / f"dubsfc-{name}.zip")
+              if recovery_zip else {"backup": None})
     paths, failures = committable(root, protect=True)
     if not paths:
         raise ArchiveError("Archive check failed for " + failures)
@@ -117,7 +121,7 @@ def persist(root: Path, branch: str, *, pause=time.sleep, git_name: str = BOT_NA
                 raise ArchiveError("Verified club archives were committed and pushed. NOT committed, "
                                    "left untouched for recovery: " + failures)
             result = {"status": "pushed", "new_commit": changed, "recovery_zip": backup["backup"]}
-            if keep_recovery is not None:
+            if keep_recovery is not None and backup["backup"]:
                 result["recovery_zips_removed"] = prune_recovery(
                     Path(backup["backup"]).parent, keep_recovery, Path(backup["backup"]))
             return result
@@ -143,6 +147,8 @@ def main() -> int:
     parser.add_argument("--branch", required=True)
     parser.add_argument("--git-name", default=BOT_NAME, help="Commit author name")
     parser.add_argument("--git-email", default=BOT_EMAIL, help="Commit author email")
+    parser.add_argument("--no-recovery-zip", action="store_true",
+                        help="Skip the full-archive recovery ZIP (for a collector with durable local storage)")
     parser.add_argument("--keep-recovery", type=int, metavar="N",
                         help="After a successful push, keep only the newest N recovery ZIPs (default: keep all)")
     args = parser.parse_args()
@@ -151,7 +157,7 @@ def main() -> int:
     try:
         with repository_lock(ROOT):
             print(persist(ROOT, args.branch, git_name=args.git_name, git_email=args.git_email,
-                          keep_recovery=args.keep_recovery))
+                          keep_recovery=args.keep_recovery, recovery_zip=not args.no_recovery_zip))
         return 0
     except (ArchiveError, OSError) as exc:
         print(f"Archive persistence error: {exc}", file=sys.stderr)
