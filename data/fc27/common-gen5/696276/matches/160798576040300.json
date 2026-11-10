@@ -2,7 +2,7 @@
   "club_id": "696276",
   "edition": "fc27",
   "first_archived_at": "2026-11-02T14:41:18+00:00",
-  "last_changed_at": "2026-11-09T14:38:35+00:00",
+  "last_changed_at": "2026-11-10T00:39:25+00:00",
   "match_id": "160798576040300",
   "match_types": [
     "leagueMatch"
@@ -113,7 +113,7 @@
             "kitColor2": "5775459",
             "kitColor3": "5775459",
             "kitColor4": "5775459",
-            "kitId": "532480",
+            "kitId": "10936320",
             "kitThrdColor1": "12706617",
             "kitThrdColor2": "33627",
             "kitThrdColor3": "396864",
@@ -125,7 +125,7 @@
           },
           "name": "LES MECANO 976",
           "regionId": 5457237,
-          "teamId": 65
+          "teamId": 1335
         },
         "gameNumber": "0",
         "goals": "3",
