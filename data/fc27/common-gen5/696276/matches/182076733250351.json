@@ -2,7 +2,7 @@
   "club_id": "696276",
   "edition": "fc27",
   "first_archived_at": "2026-11-10T22:39:26+00:00",
-  "last_changed_at": "2026-11-10T22:39:26+00:00",
+  "last_changed_at": "2026-11-10T23:08:55+00:00",
   "match_id": "182076733250351",
   "match_types": [
     "leagueMatch"
@@ -113,7 +113,7 @@
             "kitColor2": "5775459",
             "kitColor3": "5775459",
             "kitColor4": "5775459",
-            "kitId": "924819456",
+            "kitId": "11223040",
             "kitThrdColor1": "12706617",
             "kitThrdColor2": "33627",
             "kitThrdColor3": "396864",
@@ -125,7 +125,7 @@
           },
           "name": "ASB13",
           "regionId": 5457237,
-          "teamId": 112893
+          "teamId": 1370
         },
         "gameNumber": "0",
         "goals": "2",
@@ -359,7 +359,7 @@
       }
     },
     "timeAgo": {
-      "number": 18,
+      "number": 47,
       "unit": "minutes"
     },
     "timestamp": 1794349258
