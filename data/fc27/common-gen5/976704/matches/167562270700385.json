@@ -2,7 +2,7 @@
   "club_id": "976704",
   "edition": "fc27",
   "first_archived_at": "2026-11-04T23:43:26+00:00",
-  "last_changed_at": "2026-11-10T17:38:00+00:00",
+  "last_changed_at": "2026-11-10T21:09:28+00:00",
   "match_id": "167562270700385",
   "match_types": [
     "leagueMatch"
@@ -113,7 +113,7 @@
             "kitColor2": "5775459",
             "kitColor3": "5775459",
             "kitColor4": "5775459",
-            "kitId": "2015232",
+            "kitId": "540672",
             "kitThrdColor1": "12706617",
             "kitThrdColor2": "33627",
             "kitThrdColor3": "396864",
@@ -125,7 +125,7 @@
           },
           "name": "Fc Black Ops",
           "regionId": 5457237,
-          "teamId": 246
+          "teamId": 66
         },
         "gameNumber": "0",
         "goals": "0",
