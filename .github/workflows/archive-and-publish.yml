@@ -21,7 +21,7 @@ on:
       - '.github/workflows/**'
 
 concurrency:
-  group: clubs-archive-and-pages
+  group: clubs-archive-and-pages-recovery-v2
   cancel-in-progress: false
 
 permissions:
