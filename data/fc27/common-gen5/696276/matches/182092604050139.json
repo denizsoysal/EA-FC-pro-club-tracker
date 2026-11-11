@@ -2,7 +2,7 @@
   "club_id": "696276",
   "edition": "fc27",
   "first_archived_at": "2026-11-10T22:09:35+00:00",
-  "last_changed_at": "2026-11-11T15:09:36+00:00",
+  "last_changed_at": "2026-11-11T16:07:38+00:00",
   "match_id": "182092604050139",
   "match_types": [
     "leagueMatch"
@@ -109,10 +109,10 @@
             "kitAColor2": "592653",
             "kitAColor3": "592653",
             "kitAColor4": "592653",
-            "kitColor1": "592653",
-            "kitColor2": "15921906",
-            "kitColor3": "15921906",
-            "kitColor4": "15921906",
+            "kitColor1": "16773120",
+            "kitColor2": "592653",
+            "kitColor3": "592653",
+            "kitColor4": "592653",
             "kitId": "1794048",
             "kitThrdColor1": "858595",
             "kitThrdColor2": "16773120",
@@ -359,7 +359,7 @@
       }
     },
     "timeAgo": {
-      "number": 17,
+      "number": 18,
       "unit": "hours"
     },
     "timestamp": 1794348181

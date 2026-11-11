@@ -2,7 +2,7 @@
   "club_id": "976704",
   "edition": "fc27",
   "first_archived_at": "2026-11-05T01:13:50+00:00",
-  "last_changed_at": "2026-11-11T01:09:21+00:00",
+  "last_changed_at": "2026-11-11T16:08:04+00:00",
   "match_id": "167428961240494",
   "match_types": [
     "leagueMatch"
@@ -104,7 +104,7 @@
             "customKeeperKitId": "5035",
             "customKitId": "7630",
             "customThirdKitId": "7705",
-            "dCustomKit": "3",
+            "dCustomKit": "1",
             "kitAColor1": "592653",
             "kitAColor2": "15921906",
             "kitAColor3": "15921906",
@@ -118,8 +118,8 @@
             "kitThrdColor2": "16400136",
             "kitThrdColor3": "592653",
             "kitThrdColor4": "22436",
-            "seasonalKitId": "1076404224",
-            "seasonalTeamId": "131397",
+            "seasonalKitId": "1080639488",
+            "seasonalTeamId": "131914",
             "selectedKitType": "0",
             "stadName": "Gillette Stadiu"
           },
