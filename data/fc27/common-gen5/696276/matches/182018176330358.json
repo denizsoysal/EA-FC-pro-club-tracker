@@ -2,7 +2,7 @@
   "club_id": "696276",
   "edition": "fc27",
   "first_archived_at": "2026-11-10T21:08:55+00:00",
-  "last_changed_at": "2026-11-13T21:08:58+00:00",
+  "last_changed_at": "2026-11-13T22:38:38+00:00",
   "match_id": "182018176330358",
   "match_types": [
     "leagueMatch"
@@ -113,7 +113,7 @@
             "kitColor2": "14655653",
             "kitColor3": "15132367",
             "kitColor4": "14655653",
-            "kitId": "90113",
+            "kitId": "368640",
             "kitThrdColor1": "14655653",
             "kitThrdColor2": "22436",
             "kitThrdColor3": "14655653",
@@ -125,7 +125,7 @@
           },
           "name": "Funky boys 94",
           "regionId": 5457237,
-          "teamId": 11
+          "teamId": 45
         },
         "gameNumber": "0",
         "goals": "2",
