@@ -2,7 +2,7 @@
   "club_id": "976704",
   "edition": "fc27",
   "first_archived_at": "2026-11-13T18:09:35+00:00",
-  "last_changed_at": "2026-11-13T23:09:56+00:00",
+  "last_changed_at": "2026-11-14T00:09:06+00:00",
   "match_id": "188622748750380",
   "match_types": [
     "leagueMatch"
@@ -114,14 +114,14 @@
             "kitColor3": "16045584",
             "kitColor4": "15921906",
             "kitId": "1974273",
-            "kitThrdColor1": "6316123",
-            "kitThrdColor2": "11129066",
+            "kitThrdColor1": "6387790",
+            "kitThrdColor2": "6316123",
             "kitThrdColor3": "1711155",
             "kitThrdColor4": "592653",
             "seasonalKitId": "1076404224",
             "seasonalTeamId": "131397",
             "selectedKitType": "1",
-            "stadName": "Stade niveau 1"
+            "stadName": "SchücoArena"
           },
           "name": "FC Educative",
           "regionId": 5457237,
@@ -441,7 +441,7 @@
       }
     },
     "timeAgo": {
-      "number": 5,
+      "number": 6,
       "unit": "hours"
     },
     "timestamp": 1794592095
