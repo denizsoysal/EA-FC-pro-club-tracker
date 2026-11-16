@@ -2,7 +2,7 @@
   "club_id": "976704",
   "edition": "fc27",
   "first_archived_at": "2026-11-12T21:38:04+00:00",
-  "last_changed_at": "2026-11-15T21:38:39+00:00",
+  "last_changed_at": "2026-11-16T18:39:37+00:00",
   "match_id": "187186158800099",
   "match_types": [
     "leagueMatch"
@@ -113,19 +113,19 @@
             "kitColor2": "5775459",
             "kitColor3": "5775459",
             "kitColor4": "5775459",
-            "kitId": "922312704",
+            "kitId": "40960",
             "kitThrdColor1": "12706617",
             "kitThrdColor2": "33627",
             "kitThrdColor3": "396864",
             "kitThrdColor4": "5775459",
             "seasonalKitId": "1080639488",
             "seasonalTeamId": "131914",
-            "selectedKitType": "2",
+            "selectedKitType": "0",
             "stadName": "MATRADE Loftus "
           },
           "name": "FBG DUCK",
           "regionId": 5457237,
-          "teamId": 112587
+          "teamId": 5
         },
         "gameNumber": "0",
         "goals": "9",
