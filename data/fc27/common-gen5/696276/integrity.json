@@ -12,6 +12,10 @@
       "bytes": 1546,
       "sha256": "3d3c98cf34d4f489d1a9a68531b7753d1f2744242468e20027885441bbb91caf"
     },
+    "club_stats/55095e3520c96df30a56ae44d4ab04539a5745044c08ac21f32eed6e877cf62d.json": {
+      "bytes": 1471,
+      "sha256": "55095e3520c96df30a56ae44d4ab04539a5745044c08ac21f32eed6e877cf62d"
+    },
     "club_stats/579d025f6b822b7cd17e66fc3540833a01887c3e46cdeac37704c9f10c625516.json": {
       "bytes": 1475,
       "sha256": "579d025f6b822b7cd17e66fc3540833a01887c3e46cdeac37704c9f10c625516"
@@ -19,6 +23,10 @@
     "club_stats/5a53028f39e5245bf348cf92defc1d324fbf478efea50808d034e8d3ed9605bc.json": {
       "bytes": 1469,
       "sha256": "5a53028f39e5245bf348cf92defc1d324fbf478efea50808d034e8d3ed9605bc"
+    },
+    "club_stats/80ed4b84d75287f573a46832be3a3c7fb9897a3325f06e660f15f500be3346f0.json": {
+      "bytes": 1471,
+      "sha256": "80ed4b84d75287f573a46832be3a3c7fb9897a3325f06e660f15f500be3346f0"
     },
     "club_stats/82bfa17c5a7d57968cf89dc66304ad3dd8ffd7611a309644bd5bac657a193d53.json": {
       "bytes": 1472,
@@ -248,13 +256,17 @@
       "bytes": 13046,
       "sha256": "a16c00153567b68f5b5dbfd4f2bb52ca5e4b8c846bfc56e2606937c4be4009ce"
     },
+    "matches/198826735480245.json": {
+      "bytes": 16032,
+      "sha256": "a7a2a244437b7cf3b6616e7cf1a1ec700b41dc381a5a3b66eac9558ba728eee8"
+    },
     "matches/198908490440085.json": {
       "bytes": 14675,
-      "sha256": "f73c6d1642ab398de62ce6db9c548f4b44ebef223177a5fb989c6d7aba3da566"
+      "sha256": "53caf5c02a052c2b29a7e81c8bed89cf64fcebe246b865b360704d216a885785"
     },
     "matches/198954298650486.json": {
       "bytes": 14512,
-      "sha256": "aca58bb5400c9eaf0bca996c3d2ee4cf046c054e3f21188e5b090cb1fd99b3e7"
+      "sha256": "3a2c2c996e8ab9d33634078a2980587c55af38e906a8d169aed6467cd29f439f"
     },
     "matches/32990842810194.json": {
       "bytes": 18931,
@@ -452,6 +464,10 @@
       "bytes": 1349,
       "sha256": "4bf18f6ec5e12c5a6327dfa38b65956722b36b56d8652f2c943f8908929254a3"
     },
+    "responses/clubStats/4f79e7a51613de2694ae9de47016487ccc93d7a6965309246df62cff94b24a7d.json": {
+      "bytes": 1349,
+      "sha256": "4f79e7a51613de2694ae9de47016487ccc93d7a6965309246df62cff94b24a7d"
+    },
     "responses/clubStats/6a0dbaec57841d63ddd1861752b7e72f881890dd674ee76e4c4d795f9e488a74.json": {
       "bytes": 1345,
       "sha256": "6a0dbaec57841d63ddd1861752b7e72f881890dd674ee76e4c4d795f9e488a74"
@@ -483,6 +499,10 @@
     "responses/clubStats/cd37b2a9232d1b12f10bab9f14f6bb12aa695d3208fdeb861f189bef05af9fea.json": {
       "bytes": 1349,
       "sha256": "cd37b2a9232d1b12f10bab9f14f6bb12aa695d3208fdeb861f189bef05af9fea"
+    },
+    "responses/clubStats/d8e0b57d419c4e1f884a2fb48a5e8d796e0c9e777f3e82a852a4d080447b4ea5.json": {
+      "bytes": 1349,
+      "sha256": "d8e0b57d419c4e1f884a2fb48a5e8d796e0c9e777f3e82a852a4d080447b4ea5"
     },
     "responses/clubStats/ddc1d7dc3c3f995f4516555f1c4058de2f7c998b81a293b01a3243cd6121f304.json": {
       "bytes": 1349,
@@ -1503,6 +1523,10 @@
     "responses/leagueMatch/66d2f125bb2059b32a71b24e97ba53f3ee683ac76e3715e2759c6a62afd96017.json": {
       "bytes": 118229,
       "sha256": "66d2f125bb2059b32a71b24e97ba53f3ee683ac76e3715e2759c6a62afd96017"
+    },
+    "responses/leagueMatch/6799d824dabbfbc158f102e7a26f4a6061cab50bb288ccbc4d55820ead8993d4.json": {
+      "bytes": 117377,
+      "sha256": "6799d824dabbfbc158f102e7a26f4a6061cab50bb288ccbc4d55820ead8993d4"
     },
     "responses/leagueMatch/67b94421e1379a6c8d1217262f0cfcc763db5d69698f953f03f94142eeef158e.json": {
       "bytes": 120045,
@@ -3311,6 +3335,10 @@
     "responses/playoffMatch/8ba75e730b14c1befae1898f355a14b92c93d32760eae9ec9152b9612bf672ff.json": {
       "bytes": 72301,
       "sha256": "8ba75e730b14c1befae1898f355a14b92c93d32760eae9ec9152b9612bf672ff"
+    },
+    "responses/playoffMatch/8c1e714c3a1af05f35d547fe3f1cdb62d346fd25e6e921bcc6c1675335c8bc05.json": {
+      "bytes": 58573,
+      "sha256": "8c1e714c3a1af05f35d547fe3f1cdb62d346fd25e6e921bcc6c1675335c8bc05"
     },
     "responses/playoffMatch/8c8904a128a1da0dcae300269ffd26f82fec7c2ea82de818b44f7f75ff2e5961.json": {
       "bytes": 138949,
@@ -9736,9 +9764,21 @@
       "bytes": 13048,
       "sha256": "fec046585691fd18db802f4bb19d88f2304dbeb6ebc4fadba5e915baeb18533d"
     },
+    "revisions/198826735480245/a7a2a244437b7cf3b6616e7cf1a1ec700b41dc381a5a3b66eac9558ba728eee8.json": {
+      "bytes": 16032,
+      "sha256": "a7a2a244437b7cf3b6616e7cf1a1ec700b41dc381a5a3b66eac9558ba728eee8"
+    },
+    "revisions/198908490440085/53caf5c02a052c2b29a7e81c8bed89cf64fcebe246b865b360704d216a885785.json": {
+      "bytes": 14675,
+      "sha256": "53caf5c02a052c2b29a7e81c8bed89cf64fcebe246b865b360704d216a885785"
+    },
     "revisions/198908490440085/f73c6d1642ab398de62ce6db9c548f4b44ebef223177a5fb989c6d7aba3da566.json": {
       "bytes": 14675,
       "sha256": "f73c6d1642ab398de62ce6db9c548f4b44ebef223177a5fb989c6d7aba3da566"
+    },
+    "revisions/198954298650486/3a2c2c996e8ab9d33634078a2980587c55af38e906a8d169aed6467cd29f439f.json": {
+      "bytes": 14512,
+      "sha256": "3a2c2c996e8ab9d33634078a2980587c55af38e906a8d169aed6467cd29f439f"
     },
     "revisions/198954298650486/aca58bb5400c9eaf0bca996c3d2ee4cf046c054e3f21188e5b090cb1fd99b3e7.json": {
       "bytes": 14512,
@@ -13492,6 +13532,10 @@
       "bytes": 123592,
       "sha256": "a53222ff6836bd35d4428913e84987b55c36a4fea51202e89d2c32a3d87ab8a6"
     },
+    "snapshots/leagueMatch/a58714560924ff1be08db5790600a45d79372d5b050f7e024c831ded670977f5.json": {
+      "bytes": 135143,
+      "sha256": "a58714560924ff1be08db5790600a45d79372d5b050f7e024c831ded670977f5"
+    },
     "snapshots/leagueMatch/a85953d1a431676414d6c7ded619a93e6a2ca9da129efab8c26992bde51176ef.json": {
       "bytes": 138612,
       "sha256": "a85953d1a431676414d6c7ded619a93e6a2ca9da129efab8c26992bde51176ef"
@@ -14839,6 +14883,10 @@
     "snapshots/playoffMatch/8c531555e546b235d1aca945b0dd66ffd3131230e451c49b7087fd9549accc76.json": {
       "bytes": 95747,
       "sha256": "8c531555e546b235d1aca945b0dd66ffd3131230e451c49b7087fd9549accc76"
+    },
+    "snapshots/playoffMatch/8c70026b493d45adbaaa270e0f725e4d8fe69e0662bb8a95760e15d9a2a73afc.json": {
+      "bytes": 67182,
+      "sha256": "8c70026b493d45adbaaa270e0f725e4d8fe69e0662bb8a95760e15d9a2a73afc"
     },
     "snapshots/playoffMatch/8dff3f8bb2376ef97b0ef02877ac45e2c5a07fd941b5c009c4b2e8381ec6e957.json": {
       "bytes": 160163,
