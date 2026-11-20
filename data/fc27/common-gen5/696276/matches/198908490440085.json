@@ -2,7 +2,7 @@
   "club_id": "696276",
   "edition": "fc27",
   "first_archived_at": "2026-11-17T18:38:09+00:00",
-  "last_changed_at": "2026-11-20T18:39:32+00:00",
+  "last_changed_at": "2026-11-20T21:39:11+00:00",
   "match_id": "198908490440085",
   "match_types": [
     "leagueMatch"
@@ -113,19 +113,19 @@
             "kitColor2": "16765440",
             "kitColor3": "16045584",
             "kitColor4": "592653",
-            "kitId": "598016",
+            "kitId": "910196736",
             "kitThrdColor1": "396864",
             "kitThrdColor2": "8656677",
             "kitThrdColor3": "16765440",
             "kitThrdColor4": "16765440",
             "seasonalKitId": "1085759488",
             "seasonalTeamId": "132539",
-            "selectedKitType": "0",
+            "selectedKitType": "2",
             "stadName": "Estadio de nive"
           },
           "name": "FC RETRO X",
           "regionId": 5457237,
-          "teamId": 73
+          "teamId": 111108
         },
         "gameNumber": "0",
         "goals": "3",
