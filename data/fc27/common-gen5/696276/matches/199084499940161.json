@@ -2,7 +2,7 @@
   "club_id": "696276",
   "edition": "fc27",
   "first_archived_at": "2026-11-17T20:08:38+00:00",
-  "last_changed_at": "2026-11-21T20:08:22+00:00",
+  "last_changed_at": "2026-11-21T23:09:52+00:00",
   "match_id": "199084499940161",
   "match_types": [
     "leagueMatch"
@@ -113,7 +113,7 @@
             "kitColor2": "5775459",
             "kitColor3": "5775459",
             "kitColor4": "5775459",
-            "kitId": "3670019",
+            "kitId": "73728",
             "kitThrdColor1": "12706617",
             "kitThrdColor2": "33627",
             "kitThrdColor3": "396864",
@@ -125,7 +125,7 @@
           },
           "name": "Paix FC",
           "regionId": 5457237,
-          "teamId": 448
+          "teamId": 9
         },
         "gameNumber": "0",
         "goals": "5",
