@@ -2,7 +2,7 @@
   "club_id": "696276",
   "edition": "fc27",
   "first_archived_at": "2026-11-17T18:38:09+00:00",
-  "last_changed_at": "2026-11-24T20:37:43+00:00",
+  "last_changed_at": "2026-11-25T02:09:32+00:00",
   "match_id": "198908490440085",
   "match_types": [
     "leagueMatch"
@@ -113,7 +113,7 @@
             "kitColor2": "16765440",
             "kitColor3": "16045584",
             "kitColor4": "592653",
-            "kitId": "10854400",
+            "kitId": "11157504",
             "kitThrdColor1": "396864",
             "kitThrdColor2": "8656677",
             "kitThrdColor3": "16765440",
@@ -125,7 +125,7 @@
           },
           "name": "FC RETRO X",
           "regionId": 5457237,
-          "teamId": 1325
+          "teamId": 1362
         },
         "gameNumber": "0",
         "goals": "3",
